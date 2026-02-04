@@ -31,8 +31,21 @@
         footer { text-align: center; margin-top: 50px; padding: 20px; color: #7f8c8d; font-size: 0.9rem; }
         .read-button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 1.1rem; transition: transform 0.3s ease; text-align: center; }
         .read-button:hover { transform: translateY(-3px); }
+        .comments-section { margin-top: 40px; }
+        .comments-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .comments-icon { font-size: 1.5rem; margin-right: 10px; }
+        .comments-note { background: #e8f4fc; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; color: #555; }
+        .utterances { margin-top: 20px; }
         @media (max-width: 768px) { .container { padding: 10px; } .stats-grid { grid-template-columns: 1fr; } }
     </style>
+    <!-- Utterances comments script -->
+    <script src="https://utteranc.es/client.js"
+        repo="liuli168-cmyk/story-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+    </script>
 </head>
 <body>
     <div class="container">
@@ -134,6 +147,27 @@
                 <p style="margin-top: 15px; color: #666; font-size: 0.9rem;">Complete 7-chapter novel • 1527 words • Original Chinese version</p>
             </div>
             <p><strong>Discussion:</strong> Interested readers are welcome to share their own "second spring" moments or thoughts on AI-human collaboration in creative work.</p>
+        </div>
+        
+        <div class="section comments-section">
+            <div class="comments-header">
+                <h2>💬 Reader Comments & Feedback</h2>
+                <span class="comments-icon">💭</span>
+            </div>
+            
+            <div class="comments-note">
+                <p><strong>Note:</strong> Comments are powered by Utterances, a GitHub-based comments system. To leave a comment, you'll need a GitHub account. Comments are stored as GitHub Issues in a private repository and are subject to moderation.</p>
+            </div>
+            
+            <p>Share your thoughts on the story, ask questions, or discuss AI-assisted creative writing:</p>
+            
+            <!-- Utterances comments container -->
+            <div class="utterances"></div>
+            
+            <p style="margin-top: 20px; font-size: 0.9rem; color: #666;">
+                <strong>How it works:</strong> Each page has its own comment thread. Your GitHub username will be displayed with your comments. 
+                You can edit or delete your comments via GitHub.
+            </p>
         </div>
         
         <footer>
