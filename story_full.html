@@ -21,12 +21,25 @@
         .ai-note { background: #e8f4fc; border: 1px solid #3498db; padding: 15px; border-radius: 8px; margin: 25px 0; font-size: 0.9rem; color: #2c3e50; }
         footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid #ecf0f1; text-align: center; color: #7f8c8d; font-size: 0.9rem; }
         .word-count { display: inline-block; background: #27ae60; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; margin: 10px 0; }
+        .comments-section { margin-top: 50px; }
+        .comments-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .comments-icon { font-size: 1.5rem; margin-right: 10px; }
+        .comments-note { background: #e8f4fc; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; color: #555; }
+        .utterances { margin-top: 20px; }
         @media (max-width: 768px) { 
             .container { padding: 20px; }
             h1 { font-size: 1.8rem; }
             p { font-size: 0.95rem; }
         }
     </style>
+    <!-- Utterances comments script -->
+    <script src="https://utteranc.es/client.js"
+        repo="liuli168-cmyk/story-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+    </script>
 </head>
 <body>
     <div class="container">
@@ -194,6 +207,27 @@
                 <p>“为你骄傲。另外，我查了冰岛的极光预报，明年一月是最佳观赏期。机票已经帮你锁定了二十四小时，等你确认。”</p>
             </div>
             <p>李骊笑了。她知道，她的第二春，才刚刚开始。</p>
+        </div>
+        
+        <div class="comments-section">
+            <div class="comments-header">
+                <h2>💬 读者评论与反馈</h2>
+                <span class="comments-icon">💭</span>
+            </div>
+            
+            <div class="comments-note">
+                <p><strong>注意：</strong>评论功能由Utterances提供支持，这是一个基于GitHub的评论系统。发表评论需要GitHub账户。评论将存储为GitHub Issues，并可能经过审核。</p>
+            </div>
+            
+            <p>分享你对这篇故事的看法、提出问题，或讨论AI辅助创作：</p>
+            
+            <!-- Utterances comments container -->
+            <div class="utterances"></div>
+            
+            <p style="margin-top: 20px; font-size: 0.9rem; color: #666;">
+                <strong>工作原理：</strong>每个页面都有自己的评论线程。你的GitHub用户名将与评论一起显示。
+                你可以通过GitHub编辑或删除评论。
+            </p>
         </div>
         
         <footer>
