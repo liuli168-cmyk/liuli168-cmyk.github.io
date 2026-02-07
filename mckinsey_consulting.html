@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>麦肯锡咨询报告 - 职业发展计划</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; line-height: 1.6; color: #333; background: #f5f7fa; padding: 20px; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .container { max-width: 600px; width: 100%; text-align: center; }
+        .login-box { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .locked-icon { font-size: 3rem; margin-bottom: 20px; color: #666; }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        p { color: #7f8c8d; margin-bottom: 30px; }
+        .password-input { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; margin-bottom: 20px; transition: border-color 0.3s; }
+        .password-input:focus { outline: none; border-color: #3498db; }
+        .submit-btn { width: 100%; padding: 15px; background: #3498db; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+        .submit-btn:hover { background: #2980b9; }
+        .error { color: #e74c3c; margin-top: 10px; display: none; }
+        .content { display: none; max-width: 1000px; margin: 0 auto; text-align: left; }
+        .back-link { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #95a5a6; color: white; text-decoration: none; border-radius: 5px; font-weight: 600; }
+        .section { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .section h2 { color: #3498db; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; margin-bottom: 20px; }
+        .subsection { margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        .subsection h3 { color: #2c3e50; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #555; }
+        .highlight { background: #e8f6f3; border-left: 5px solid #27ae60; padding: 20px; margin: 20px 0; border-radius: 0 10px 10px 0; }
+        .tip { background: #fff8e1; border-left: 5px solid #f39c12; padding: 20px; margin: 20px 0; border-radius: 0 10px 10px 0; }
+        .action-item { background: #e8f4fc; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 5px solid #3498db; }
+        .action-item h4 { color: #2980b9; margin-bottom: 10px; }
+        .timeline { position: relative; padding-left: 30px; margin: 25px 0; }
+        .timeline:before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #3498db; }
+        .timeline-item { position: relative; margin-bottom: 25px; }
+        .timeline-item:before { content: ''; position: absolute; left: -36px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: #3498db; border: 3px solid white; box-shadow: 0 0 0 3px #3498db; }
+        .timeline-date { font-weight: 600; color: #3498db; margin-bottom: 5px; }
+        @media (max-width: 600px) {
+            .login-box, .section { padding: 20px; }
+            body { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loginSection" class="login-box">
+            <div class="locked-icon">🔒</div>
+            <h1>麦肯锡职业发展咨询报告</h1>
+            <p>此页面包含Lilly的专属职业发展规划建议。请输入密码访问。</p>
+            <input type="password" id="passwordInput" class="password-input" placeholder="输入密码" autocomplete="off">
+            <button id="submitBtn" class="submit-btn">访问报告</button>
+            <div id="errorMsg" class="error">密码错误。请重试。</div>
+            <a href="index.html" class="back-link">← 返回主页</a>
+            <div style="margin-top: 20px; font-size: 0.9rem; color: #95a5a6;">
+                <p><strong>默认密码</strong>: consulting123</p>
+                <p><em>如需更改密码，请修改此文件的CORRECT_PASSWORD变量</em></p>
+            </div>
+        </div>
+        
+        <div id="contentSection" class="content">
+            <!-- 报告内容将在此加载 -->
+        </div>
+    </div>
+
+    <script>
+        // 密码设置
+        const CORRECT_PASSWORD = "consulting123";
+        
+        const loginSection = document.getElementById('loginSection');
+        const contentSection = document.getElementById('contentSection');
+        const passwordInput = document.getElementById('passwordInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        
+        submitBtn.addEventListener('click', checkPassword);
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkPassword();
+        });
+        
+        function checkPassword() {
+            const enteredPassword = passwordInput.value.trim();
+            
+            if (enteredPassword === CORRECT_PASSWORD) {
+                // 加载报告内容
+                loadConsultingReport();
+                loginSection.style.display = 'none';
+                contentSection.style.display = 'block';
+                errorMsg.style.display = 'none';
+                passwordInput.value = '';
+            } else {
+                errorMsg.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+        
+        function loadConsultingReport() {
+            contentSection.innerHTML = `
+                <div style="max-width: 1000px; margin: 0 auto;">
+                    <header style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 30px;">
+                        <h1 style="color: #2c3e50; margin-bottom: 10px;">麦肯锡（McKinsey）咨询报告</h1>
+                        <p style="font-size: 1.2rem; color: #7f8c8d;">非技术背景总监的技术领导力发展计划</p>
+                        <p><strong>客户：</strong>Lilly（花旗银行网络服务部门总监）</p>
+                        <p><strong>日期：</strong>2026年2月7日</p>
+                        <p><strong>机密级别：</strong>内部使用 - 请勿外传</p>
+                        <a href="index.html" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">← 返回主页</a>
+                    </header>
+                    
+                    <div class="section">
+                        <h2>一、现状分析：您的技术领导力差距与优势</h2>
+                        
+                        <div class="subsection">
+                            <h3>优势（Strengths）：</h3>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li><strong>深厚的业务理解</strong>：熟悉风险合规、产品生命周期、预算规划与生产力跟踪</li>
+                                <li><strong>管理经验</strong>：具备人员管理、项目协调、跨部门沟通等软技能</li>
+                                <li><strong>合规与风险意识</strong>：金融行业的合规要求是您的核心能力</li>
+                                <li><strong>战略思维</strong>：长期规划与资源分配能力</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="subsection">
+                            <h3>差距（Gaps）：</h3>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li><strong>技术深度不足</strong>：对网络服务的核心技术缺乏实操经验</li>
+                                <li><strong>技术团队信任度</strong>：工程师可能怀疑您的技术决策能力</li>
+                                <li><strong>技术趋势敏感度</strong>：对新兴技术了解有限</li>
+                                <li><strong>技术语言障碍</strong>：与技术团队沟通时存在术语理解困难</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="highlight">
+                            <h3>核心挑战</h3>
+                            <p>如何在保持现有管理优势的同时，快速建立技术领域的可信度与决策能力。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>二、技能提升计划：从非技术到技术领导的有效过渡路径</h2>
+                        
+                        <table>
+                            <tr>
+                                <th>阶段</th>
+                                <th>重点领域</th>
+                                <th>具体技能目标</th>
+                            </tr>
+                            <tr>
+                                <td><strong>基础层</strong><br>(3‑6个月)</td>
+                                <td>技术通识与金融科技基础</td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li>理解网络服务的基本架构（云、容器、API）</li>
+                                        <li>掌握金融行业核心技术术语</li>
+                                        <li>学习敏捷开发与DevOps基础</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>进阶层</strong><br>(6‑12个月)</td>
+                                <td>深度技术与管理结合</td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li>能够评审技术方案的风险与合规影响</li>
+                                        <li>参与技术架构讨论，提出业务视角优化建议</li>
+                                        <li>主导技术预算与资源分配，提升ROI</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>领导层</strong><br>(1‑2年)</td>
+                                <td>战略技术领导力</td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li>制定部门技术路线图，与业务战略对齐</li>
+                                        <li>推动技术创新（如自动化合规检查）</li>
+                                        <li>成为业务与技术之间的"翻译官"与桥梁</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>三、领导力发展：在保持管理优势的同时建立技术可信度</h2>
+                        
+                        <div class="tip">
+                            <h3>核心原则</h3>
+                            <p>不要试图成为最懂技术的人，而要成为最懂"如何用技术驱动业务"的人。</p>
+                        </div>
+                        
+                        <div class="action-item">
+                            <h4>1. 透明沟通</h4>
+                            <p>坦诚自己的非技术背景，强调学习技术的决心，邀请团队指导您。</p>
+                        </div>
+                        
+                        <div class="action-item">
+                            <h4>2. 侧重"为什么"而非"怎么做"</h4>
+                            <p>多问"这个方案如何降低风险？""如何提升客户体验？""是否符合合规要求？"——这正是您的专长。</p>
+                        </div>
+                        
+                        <div class="action-item">
+                            <h4>3. 建立技术顾问团</h4>
+                            <p>在团队中选拔2‑3位技术骨干作为"技术顾问"，定期一对一交流。</p>
+                        </div>
+                        
+                        <div class="action-item">
+                            <h4>4. 示范学习态度</h4>
+                            <p>公开分享学习笔记、课程证书，邀请团队一起参加培训。</p>
+                        </div>
+                        
+                        <div class="action-item">
+                            <h4>5. 授权与信任</h4>
+                            <p>将技术决策权下放给专家，您负责审批与风险把控，形成良性互补。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>四、具体行动计划（分阶段）</h2>
+                        
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-date">短期（3‑6个月）：夯实基础，建立信任</div>
+                                <ul style="margin-left: 20px;">
+                                    <li><strong>每周投入5小时学习</strong>：Coursera《Google IT Support Professional Certificate》或《AWS Cloud Practitioner Essentials》</li>
+                                    <li><strong>每月与技术骨干进行一次"技术茶话会"</strong>：请他们讲解当前项目的技术架构</li>
+                                    <li><strong>参与一次技术评审会议</strong>：作为观察员，学习技术决策流程</li>
+                                    <li><strong>建立个人技术学习看板</strong>：公开学习进度，让团队看到您的投入</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-date">中期（6‑12个月）：深度参与，驱动价值</div>
+                                <ul style="margin-left: 20px;">
+                                    <li><strong>主导一个跨部门技术项目</strong>：如"合规自动化工具选型"</li>
+                                    <li><strong>获得一项行业认证</strong>：CISSP或AWS Solutions Architect – Associate</li>
+                                    <li><strong>定期撰写"技术‑业务双周报"</strong>：向高层汇报技术进展如何支持业务目标</li>
+                                    <li><strong>组织内部技术分享会</strong>：邀请外部专家分享金融科技趋势</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-date">长期（1‑2年）：战略领导，塑造文化</div>
+                                <ul style="margin-left: 20px;">
+                                    <li><strong>制定"网络服务部门三年技术路线图"</strong>：结合花旗银行整体战略</li>
+                                    <li><strong>推动一项技术创新试点</strong>：如"基于AI的异常交易监测"</li>
+                                    <li><strong>培养下一代技术领导者</strong>：设立"技术‑业务双轨培养计划"</li>
+                                    <li><strong>在行业会议分享转型故事</strong>：增强个人品牌，吸引跨领域人才</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>五、风险管理：在金融技术领域平衡风险与合规</h2>
+                        
+                        <div class="subsection">
+                            <h3>金融行业技术决策的三大风险维度：</h3>
+                            <ol style="margin-left: 20px; margin-top: 10px;">
+                                <li><strong>安全风险</strong>：数据泄露、系统入侵</li>
+                                <li><strong>合规风险</strong>：违反监管要求（GDPR、巴塞尔协议等）</li>
+                                <li><strong>交付风险</strong>：项目延期、超支、功能不达标</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="highlight">
+                            <h3>您的独特价值</h3>
+                            <p>您本身就是风险合规专家，可将合规思维注入技术决策全流程。</p>
+                        </div>
+                        
+                        <div class="action-item">
+                            <h4>具体措施：</h4>
+                            <ul style="margin-left: 20px;">
+                                <li><strong>引入"合规左移"</strong>：在技术设计阶段就邀请合规团队参与</li>
+                                <li><strong>建立技术决策检查表</strong>：每个方案必须回答合规、安全、灾备等问题</li>
+                                <li><strong>定期风险复盘</strong>：每季度召开技术风险回顾会，将教训转化为流程改进</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>六、学习资源与培训建议</h2>
+                        
+                        <div class="subsection">
+                            <h3>在线课程（中文友好）：</h3>
+                            <ul style="margin-left: 20px;">
+                                <li>Coursera：《Google IT Support》《AWS Cloud Practitioner》《金融科技与区块链》（清华大学）</li>
+                                <li>edX：《MITx: Introduction to Computer Science and Programming Using Python》</li>
+                                <li>极客时间：《架构师训练营》《DevOps实战》</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="subsection">
+                            <h3>书籍推荐：</h3>
+                            <ul style="margin-left: 20px;">
+                                <li>《凤凰项目》（The Phoenix Project）—— DevOps文化入门</li>
+                                <li>《企业IT架构转型之道》—— 阿里巴巴中台战略参考</li>
+                                <li>《云原生：构建可靠、可扩展的分布式系统》</li>
+                                <li>《金融科技：重塑金融生态》</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="subsection">
+                            <h3>认证路径：</h3>
+                            <ul style="margin-left: 20px;">
+                                <li><strong>安全方向</strong>：CISSP、CISM</li>
+                                <li><strong>云方向</strong>：AWS/Azure/GCP助理级认证</li>
+                                <li><strong>项目管理</strong>：PMP、敏捷认证（Scrum Master）</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>七、建立技术团队信任的实操策略</h2>
+                        
+                        <ol style="margin-left: 20px;">
+                            <li><strong>"我先听，再说"</strong>：在技术会议上，前三个月以倾听为主</li>
+                            <li><strong>公开承认无知</strong>：直接说"这个我不太懂，能否解释一下？"——赢得尊重</li>
+                            <li><strong>为团队争取资源</strong>：用预算规划能力争取更好的工具、培训</li>
+                            <li><strong>保护团队免受官僚干扰</strong>：屏蔽不必要的会议、报表</li>
+                            <li><strong>庆祝技术胜利</strong>：公开表彰技术成就，强调业务价值</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>八、成功案例参考</h2>
+                        
+                        <div class="action-item">
+                            <h4>案例1：某全球银行支付部门总监（非技术背景）</h4>
+                            <p><strong>挑战</strong>：负责支付系统的现代化改造，不懂微服务架构。</p>
+                            <p><strong>做法</strong>：聘请首席架构师作为副手，专注学习"合规要求"与"用户体验优化"。</p>
+                            <p><strong>成果</strong>：两年内成功迁移至云原生架构，合规审计通过率100%，处理速度提升3倍。</p>
+                        </div>
+                        
+                        <div class="action-item">
+                            <h4>案例2：某保险公司风控总监转型CTO</h4>
+                            <p><strong>挑战</strong>：需要领导AI风控平台开发。</p>
+                            <p><strong>做法</strong>：参加斯坦福在线AI课程，组建"业务‑技术混合团队"。</p>
+                            <p><strong>成果</strong>：欺诈检测准确率提升40%，被评为"年度最佳技术领导者"。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>九、给Lilly的特别建议</h2>
+                        
+                        <div class="highlight">
+                            <ol style="margin-left: 20px;">
+                                <li><strong>不要追求"技术全才"</strong>：目标是成为"技术‑业务双语者"</li>
+                                <li><strong>利用您的现有职权</strong>：用管理手段推动技术文化变革</li>
+                                <li><strong>找到您的"技术知己"</strong>：在团队中寻找愿意耐心解释技术的伙伴</li>
+                                <li><strong>定期自我评估</strong>：每季度回顾本计划，调整学习重点</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="tip" style="margin-top: 30px;">
+                            <h3>最后一句</h3>
+                            <p>技术领导力的核心不是编码能力，而是<strong>将技术转化为商业价值的能力</strong>。您已在业务侧拥有深厚积累，现在只需补上技术语言这一块拼图。这段旅程不会轻松，但每一步都将让您更不可替代。</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid #eee;">
+                            <p><strong>麦肯锡（McKinsey）咨询团队</strong></p>
+                            <p><em>赋能非技术背景领导者，驾驭技术浪潮</em></p>
+                        </div>
+                    </div>
+                    
+                    <footer style="text-align: center; margin-top: 50px; padding: 20px; color: #7f8c8d; font-size: 0.9rem;">
+                        <p>最后更新：2026年2月7日 | 机密文档 - 仅供个人使用</p>
+                        <p>如需更改密码，请修改此HTML文件中的CORRECT_PASSWORD变量</p>
+                    </footer>
+                </div>
+            `;
+        }
+        
+        // 自动聚焦密码输入框
+        window.onload = function() {
+            passwordInput.focus();
+        };
+    </script>
+</body>
+</html>
