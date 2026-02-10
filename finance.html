@@ -6,7 +6,9 @@
     <title>Tesla Finance Hub - Private</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, sans-serif; line-height: 1.6; color: #333; background: #f5f7fa; padding: 20px; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        body { font-family: -apple-system, sans-serif; line-height: 1.6; color: #333; background: #f5f7fa; }
+        body.login-mode { padding: 20px; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        body.content-mode { padding: 20px; }
         .container { max-width: 500px; width: 100%; text-align: center; }
         .login-box { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .locked-icon { font-size: 3rem; margin-bottom: 20px; color: #666; }
@@ -39,6 +41,9 @@
     </div>
 
     <script>
+        // Initialize body in login mode
+        document.body.classList.add('login-mode');
+        
         // Correct password (customized as requested)
         const CORRECT_PASSWORD = "781006";
         
@@ -57,6 +62,10 @@
             const enteredPassword = passwordInput.value.trim();
             
             if (enteredPassword === CORRECT_PASSWORD) {
+                // Switch from login mode to content mode
+                document.body.classList.remove('login-mode');
+                document.body.classList.add('content-mode');
+                
                 // Load the finance content
                 loadFinanceContent();
                 loginSection.style.display = 'none';

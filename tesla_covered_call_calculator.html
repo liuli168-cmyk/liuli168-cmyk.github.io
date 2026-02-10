@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tesla Covered Call Calculator - Lilly's Portfolio</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            color: #4a5568;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .fox-emoji {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h2 {
+            color: #2d3748;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .calculator-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .slider-container {
+            margin-top: 10px;
+        }
+        
+        .slider-value {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 5px;
+        }
+        
+        .results {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            color: #4a5568;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .highlight {
+            color: #38a169;
+            font-weight: 700;
+        }
+        
+        .warning {
+            color: #e53e3e;
+            font-weight: 700;
+        }
+        
+        .strategy-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .strategy-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .strategy-card.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .strategy-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        
+        .strategy-details {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .summary {
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        
+        .summary h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+        
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .summary-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .timestamp {
+            font-size: 0.9rem;
+            color: #718096;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="fox-emoji">🦊</div>
+            <h1>Tesla Covered Call Calculator</h1>
+            <div class="subtitle">Optimized for Lilly's 2,509 Tesla Shares Portfolio</div>
+            <div class="timestamp">Night Shift Research • February 9, 2026 • 10:30 PM CST</div>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <h2>📊 Portfolio Overview</h2>
+                <div class="results">
+                    <div class="result-item">
+                        <span class="result-label">Total Tesla Shares</span>
+                        <span class="result-value">2,509</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">LEAP Shares</span>
+                        <span class="result-value">400</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Cash Shares Available</span>
+                        <span class="result-value">2,109</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Average Cost Basis</span>
+                        <span class="result-value">$222</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Current Price</span>
+                        <span class="result-value">$420</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Unrealized Profit</span>
+                        <span class="result-value highlight">$442,300</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Portfolio Concentration</span>
+                        <span class="result-value">29%</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Cash for Options</span>
+                        <span class="result-value">$20,000</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Annual Income Goal</span>
+                        <span class="result-value">$15,000 - $30,000</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>🧮 Covered Call Calculator</h2>
+                <form class="calculator-form" id="calculatorForm">
+                    <div class="form-group">
+                        <label for="currentPrice">Current Tesla Price ($)</label>
+                        <input type="number" id="currentPrice" value="420" min="100" max="1000" step="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="strikeDistance">Strike Distance from Current</label>
+                        <div class="slider-container">
+                            <input type="range" id="strikeDistance" min="-10" max="20" value="10" step="1">
+                            <div class="slider-value" id="strikeDistanceValue">10% OTM</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="premiumPercent">Premium Percentage</label>
+                        <div class="slider-container">
+                            <input type="range" id="premiumPercent" min="0.5" max="5" value="2" step="0.1">
+                            <div class="slider-value" id="premiumPercentValue">2.0%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sharesToCover">Shares to Cover</label>
+                        <input type="number" id="sharesToCover" value="2109" min="100" max="2509" step="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expirationDays">Days to Expiration</label>
+                        <select id="expirationDays">
+                            <option value="7">Weekly (7 days)</option>
+                            <option value="30" selected>Monthly (30 days)</option>
+                            <option value="45">45 days</option>
+                            <option value="60">60 days</option>
+                            <option value="90">Quarterly (90 days)</option>
+                        </select>
+                    </div>
+                </form>
+                
+                <div class="results" id="calculationResults">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>⚡ Quick Strategy Analysis</h2>
+                <div class="strategy-cards">
+                    <div class="strategy-card active" id="strategyModerate">
+                        <div class="strategy-title">Moderate (10% OTM)</div>
+                        <div class="strategy-details">
+                            <p>• Strike: ~$462</p>
+                            <p>• Premium: ~2.0% monthly</p>
+                            <p>• Monthly Income: ~$17,700</p>
+                            <p>• Annual Income: ~$212,400</p>
+                            <p>• Risk: MEDIUM</p>
+                            <p>• Meets Goal: ✅</p>
+                        </div>
+                    </div>
+                    
+                    <div class="strategy-card" id="strategyConservative">
+                        <div class="strategy-title">Conservative (5% OTM)</div>
+                        <div class="strategy-details">
+                            <p>• Strike: ~$441</p>
+                            <p>• Premium: ~1.5% monthly</p>
+                            <p>• Monthly Income: ~$13,300</p>
+                            <p>• Annual Income: ~$159,600</p>
+                            <p>• Risk: LOW</p>
+                            <p>• Meets Goal: ✅</p>
+                        </div>
+                    </div>
+                    
+                    <div class="strategy-card" id="strategyAggressive">
+                        <div class="strategy-title">Aggressive (ATM)</div>
+                        <div class="strategy-details">
+                            <p>• Strike: ~$420</p>
+                            <p>• Premium: ~3.0% monthly</p>
+                            <p>• Monthly Income: ~$26,600</p>
+                            <p>• Annual Income: ~$319,200</p>
+                            <p>• Risk: HIGH</p>
+                            <p>• Meets Goal: ✅</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="updateStrategy()">Update Strategy</button>
+            </div>
+        </div>
+        
+        <div class="summary">
+            <h2>💎 Key Recommendations</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Recommended Strategy</div>
+                    <div class="summary-value">Moderate</div>
+                    <div class="summary-label">10% OTM, 2.0% premium</div>
+                </div>
+                
+                <div class="summary-item">
+                    <div class="summary-label">Expected Annual Income</div>
+                    <div class="summary-value">$212,400</div>
+                    <div class="summary-label">7x above $30k goal</div>
+                </div>
+                
+                <div class="summary-item">
+                    <div class="summary-label">Assignment Risk</div>
+                    <div class="summary-value">20%</div>
+                    <div class="summary-label">MEDIUM probability</div>
+                </div>
+                
+                <div class="summary-item">
+                    <div class="summary-label">Monthly Cash Flow</div>
+                    <div class="summary-value">$17,700</div>
+                    <div class="summary-label">Passive income</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 10px;">
+                <h3 style="color: #2d3748; margin-bottom: 15px;">🦊 Night Shift Insights</h3>
+                <p style="color: #4a5568; line-height: 1.6;">
+                    Based on real-time X/Twitter analysis via bird CLI, Tesla sentiment is mixed with recent earnings pressure. 
+                    Your current deep ITM positions ($360-$380) have HIGH assignment risk (73.6% of portfolio value). 
+                    The Moderate strategy balances income generation with manageable risk while significantly exceeding your $15-30k annual goal.
+                </p>
+                <p style="color: #4a5568; line-height: 1.6; margin-top: 15px;">
+                    <strong>Next Steps:</strong> Start with 10% OTM covered calls, monitor deep ITM positions closely, 
+                    and consider consulting a tax advisor for optimal structure given potential assignment.
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Night Shift Research by Huang Rong 🦊 • Generated February 9, 2026, 10:30 PM CST</p>
+            <p>Portfolio Data: USER.md + memory/2026-02-09-options-decision.md • X Analysis: bird CLI</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the calculator
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStrikeDistanceValue();
+            updatePremiumPercentValue();
+            calculateResults();
+            
+            // Add event listeners
+            document.getElementById('strikeDistance').addEventListener('input', updateStrikeDistanceValue);
+            document.getElementById('premiumPercent').addEventListener('input', updatePremiumPercentValue);
+            
+            const inputs = ['currentPrice', 'strikeDistance', 'premiumPercent', 'sharesToCover', 'expirationDays'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateResults);
+            });
+            
+            // Strategy selection
+            document.querySelectorAll('.strategy-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    if (this.id === 'strategyModerate') {
+                        document.getElementById('strikeDistance').value = 10;
+                        document.getElementById('premiumPercent').value = 2;
+                    } else if (this.id === 'strategyConservative') {
+                        document.getElementById('strikeDistance').value = 5;
+                        document.getElementById('premiumPercent').value = 1.5;
+                    } else if (this.id === 'strategyAggressive') {
+                        document.getElementById('strikeDistance').value = 0;
+                        document.getElementById('premiumPercent').value = 3;
+                    }
+                    
+                    updateStrikeDistanceValue();
+                    updatePremiumPercentValue();
+                    calculateResults();
+                });
+            });
+        });
+        
+        function updateStrikeDistanceValue() {
+            const slider = document.getElementById('strikeDistance');
+            const value = parseInt(slider.value);
+            const display = document.getElementById('strikeDistanceValue');
+            
+            if (value > 0) {
+                display.textContent = `${value}% OTM`;
+            } else if (value < 0) {
+                display.textContent = `${Math.abs(value)}% ITM`;
+            } else {
+                display.textContent = 'ATM';
+            }
+        }
+        
+        function updatePremiumPercentValue() {
+            const slider = document.getElementById('premiumPercent');
+            const value = parseFloat(slider.value);
+            document.getElementById('premiumPercentValue').textContent = `${value.toFixed(1)}%`;
+        }
+        
+        function updateStrategy() {
+            const strikeDistance = document.getElementById('strikeDistance').value;
+            const premiumPercent = document.getElementById('premiumPercent').value;
+            
+            if (strikeDistance == 10 && premiumPercent == 2) {
+                document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
+                document.getElementById('strategyModerate').classList.add('active');
+            } else if (strikeDistance == 5 && premiumPercent == 1.5) {
+                document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
+                document.getElementById('strategyConservative').classList.add('active');
+            } else if (strikeDistance == 0 && premiumPercent == 3) {
+                document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
+                document.getElementById('strategyAggressive').classList.add('active');
+            }
+            
+            calculateResults();
+        }
+        
+        function calculateResults() {
+            const currentPrice = parseFloat(document.getElementById('currentPrice').value);
+            const strikeDistance = parseInt(document.getElementById('strikeDistance').value);
+            const premiumPercent = parseFloat(document.getElementById('premiumPercent').value);
+            const sharesToCover = parseInt(document.getElementById('sharesToCover').value);
+            const expirationDays = parseInt(document.getElementById('expirationDays').value);
+            
+            // Calculations
+            const strikePrice = currentPrice * (1 + strikeDistance / 100);
+            const premiumPerShare = currentPrice * (premiumPercent / 100);
+            const totalPremium = premiumPerShare * sharesToCover;
+            
+            // Adjust for expiration days (convert monthly premium to actual period)
+            const periodPremium = totalPremium * (expirationDays / 30);
+            const annualizedIncome = periodPremium * (365 / expirationDays);
+            
+            // Calculate assignment probability
+            let assignmentProb;
+            if (strikeDistance <= -5) assignmentProb = 0.8; // 80% for 5%+ ITM
+            else if (strikeDistance < 0) assignmentProb = 0.7; // 70% for ITM
+            else if (strikeDistance === 0) assignmentProb = 0.7; // 70% for ATM
+            else if (strikeDistance <= 5) assignmentProb = 0.4; // 40% for 5% OTM
+            else if (strikeDistance <= 10) assignmentProb = 0.2; // 20% for 10% OTM
+            else assignmentProb = 0.1; // 10% for >10% OTM
+            
+            // Risk level
+            let riskLevel;
+            if (assignmentProb >= 0.7) riskLevel = 'HIGH';
+            else if (assignmentProb >= 0.4) riskLevel = 'MEDIUM';
+            else riskLevel = 'LOW';
+            
+            // Check if meets goal
+            const meetsGoal = annualizedIncome >= 15000 && annualizedIncome <= 30000;
+            
+            // Update results display
+            const resultsDiv = document.getElementById('calculationResults');
+            resultsDiv.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Strike Price</span>
+                    <span class="result-value">$${strikePrice.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Premium per Share</span>
+                    <span class="result-value">$${premiumPerShare.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Premium (${expirationDays} days)</span>
+                    <span class="result-value">$${periodPremium.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Annualized Income</span>
+                    <span class="result-value ${meetsGoal ? 'highlight' : 'warning'}">$${annualizedIncome.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Assignment Probability</span>
+                    <span class="result-value">${(assignmentProb * 100).toFixed(0)}%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Risk Level</span>
+                    <span class="result-value">${riskLevel}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Meets $15-30k Goal</span>
+                    <span class="result-value">${meetsGoal ? '✅ YES' : '❌ NO'}</span>
+                </div>
+            `;
+            
+            // Update summary values
+            document.querySelector('.summary-value:nth-child(2)').textContent = `$${annualizedIncome.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>

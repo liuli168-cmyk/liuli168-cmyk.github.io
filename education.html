@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katherine's Learning Hub - Education Resources</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, sans-serif; line-height: 1.6; color: #333; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { border-bottom: 2px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 40px; text-align: center; }
+        .profile-section { display: flex; align-items: center; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap; }
+        .profile-photo { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .profile-info { max-width: 600px; }
+        .profile-name { font-size: 2rem; color: #2c3e50; margin-bottom: 10px; }
+        .profile-tagline { color: #7f8c8d; font-size: 1.2rem; margin-bottom: 15px; }
+        .profile-desc { color: #555; line-height: 1.6; margin-bottom: 20px; }
+        section { margin: 40px 0; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin: 20px 0; transition: transform 0.3s, box-shadow 0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
+        .card-header { display: flex; align-items: center; margin-bottom: 15px; }
+        .card-icon { font-size: 1.8rem; margin-right: 15px; }
+        h1 { color: #24292e; font-size: 2.5rem; }
+        h2 { color: #0366d6; font-size: 1.8rem; margin-bottom: 20px; }
+        h3 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 15px; }
+        h4 { color: #586069; font-size: 1.2rem; margin-bottom: 10px; }
+        a { color: #0366d6; text-decoration: none; font-weight: 600; }
+        a:hover { text-decoration: underline; }
+        .btn { display: inline-block; padding: 12px 24px; background: #0366d6; color: white; border-radius: 6px; font-weight: 600; margin-top: 10px; }
+        .btn:hover { background: #0356b8; text-decoration: none; }
+        footer { text-align: center; margin-top: 50px; color: #888; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 25px 0; }
+        .highlight { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 10px; margin: 30px 0; }
+        .download-section { background: #e8f4fc; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .concept-map-visual { background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #27ae60; }
+        .color-key { display: flex; gap: 15px; margin: 15px 0; flex-wrap: wrap; }
+        .color-item { display: flex; align-items: center; }
+        .color-box { width: 20px; height: 20px; border-radius: 4px; margin-right: 8px; }
+        @media (max-width: 600px) {
+            .profile-section { flex-direction: column; text-align: center; }
+            .profile-photo { width: 120px; height: 120px; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="profile-section">
+                <img src="profile_photo.jpg" alt="Katherine's Learning Hub" class="profile-photo">
+                <div class="profile-info">
+                    <div class="profile-name">📚 Katherine's Learning Hub</div>
+                    <div class="profile-tagline">10th Grade Anatomy & Physiology Study Resources</div>
+                    <div class="profile-desc">
+                        Comprehensive learning materials for mastering the digestive system. 
+                        Created by AI analysis of textbook materials, concept maps, and study questions.
+                    </div>
+                    <a href="index.html" class="btn">← Back to Home</a>
+                </div>
+            </div>
+        </header>
+        
+        <section id="overview">
+            <h2>🧠 Complete Digestive System Mastery Plan</h2>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🎯</div>
+                    <h3>Learning Objectives</h3>
+                </div>
+                <p><strong>Based on analysis of Katherine's textbook materials:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Master 50+ medical terminology terms</li>
+                    <li>Understand all 4 digestive processes (ingestion, digestion, absorption, elimination)</li>
+                    <li>Memorize 8 major organs + 3 accessory organs with functions</li>
+                    <li>Answer 10 comprehensive study questions from textbook</li>
+                    <li>Create detailed concept maps for visual learning</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="concept-map">
+            <h2>🎨 Ultra-Detailed Concept Map</h2>
+            <div class="concept-map-visual">
+                <h3>Color-Coded Learning System</h3>
+                <div class="color-key">
+                    <div class="color-item">
+                        <div class="color-box" style="background-color: #27ae60;"></div>
+                        <span>Major Organs (Question 1)</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-box" style="background-color: #8e44ad;"></div>
+                        <span>Accessory Organs (Question 2)</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-box" style="background-color: #3498db;"></div>
+                        <span>Processes (Questions 3-6)</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-box" style="background-color: #f39c12;"></div>
+                        <span>Comparisons (Question 7)</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-box" style="background-color: #e74c3c;"></div>
+                        <span>Organ Details (Questions 8-10)</span>
+                    </div>
+                </div>
+                
+                <h4>Digestive System Flow Diagram</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0; font-family: monospace;">
+                    <div style="text-align: center; font-weight: bold; color: #27ae60;">INGESTION</div>
+                    <div style="text-align: center;">↓</div>
+                    <div style="text-align: center; color: #3498db;">Mouth: Mechanical (chewing) + Chemical (salivary amylase)</div>
+                    <div style="text-align: center;">↓</div>
+                    <div style="text-align: center; color: #3498db;">Esophagus: Transport via peristalsis</div>
+                    <div style="text-align: center;">↓</div>
+                    <div style="text-align: center; color: #e74c3c;">Stomach: Churning (mechanical) + HCl/Pepsin (chemical)</div>
+                    <div style="text-align: center;">↓</div>
+                    <div style="text-align: center; color: #e74c3c;">Small Intestine: Pancreatic enzymes + Absorption</div>
+                    <div style="text-align: center;">↓</div>
+                    <div style="text-align: center; color: #3498db;">Large Intestine: Water absorption + Feces formation</div>
+                    <div style="text-align: center;">↓</div>
+                    <div style="text-align: center; color: #27ae60;">ELIMINATION: Rectum → Anus</div>
+                </div>
+                
+                <div class="download-section">
+                    <h4>📥 Download Complete Concept Map</h4>
+                    <p>Contains detailed answers to all 10 textbook questions with color-coded sections.</p>
+                    <a href="katherine_ultra_detailed_concept_map.md" class="btn" style="background: #27ae60;">Download Concept Map</a>
+                    <a href="katherine_comprehensive_learning_plan.md" class="btn" style="background: #3498db; margin-left: 10px;">Learning Plan</a>
+                    <a href="katherine_6_categories_answers.md" class="btn" style="background: #9b59b6; margin-left: 10px;">Category Analysis</a>
+                </div>
+            </div>
+        </section>
+        
+        <section id="study-plan">
+            <h2>📅 6-Week Mastery Plan</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">1️⃣</div>
+                        <h3>Week 1-2: Foundation</h3>
+                    </div>
+                    <p><strong>Focus:</strong> Terminology + System Overview</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>50 medical terms flashcards</li>
+                        <li>Digestive system functions</li>
+                        <li>Basic concept map creation</li>
+                        <li>Experiment: Food digestion observation</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">2️⃣</div>
+                        <h3>Week 3-4: Organs Mastery</h3>
+                    </div>
+                    <p><strong>Focus:</strong> Major + Accessory Organs</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>8 major organs memorization</li>
+                        <li>3 accessory organs functions</li>
+                        <li>Enzyme action mapping</li>
+                        <li>Concept map expansion</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">3️⃣</div>
+                        <h3>Week 5-6: Integration</h3>
+                    </div>
+                    <p><strong>Focus:</strong> Processes + Assessment Prep</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>4 processes understanding</li>
+                        <li>Study question completion</li>
+                        <li>Final concept map assembly</li>
+                        <li>Mock assessment practice</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="resources">
+            <h2>📚 Learning Resources</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📖</div>
+                        <h3>Textbook Materials</h3>
+                    </div>
+                    <p><strong>Goodheart-Willcox: Introduction to Medical Terminology</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Chapter 8: The Digestive System</li>
+                        <li>7 textbook pages analyzed</li>
+                        <li>10 comprehensive study questions</li>
+                        <li>Medical terminology prefix/suffix list</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔬</div>
+                        <h3>Hands-On Experiments</h3>
+                    </div>
+                    <p><strong>Saltine Cracker Experiment</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Compare cracker vs other food digestion</li>
+                        <li>Understand salivary amylase action</li>
+                        <li>Observation journal template</li>
+                        <li>Analysis worksheet</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🗺️</div>
+                        <h3>Concept Map Templates</h3>
+                    </div>
+                    <p><strong>Visual Learning Tools</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Digital concept map (Lucidchart)</li>
+                        <li>Hand-drawn template examples</li>
+                        <li>Color-coded section guides</li>
+                        <li>Progressive expansion framework</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="answers">
+            <h2>❓ Answering the 10 Study Questions</h2>
+            <div class="highlight">
+                <h3 style="color: white;">Complete Question-by-Question Guide</h3>
+                <p style="color: white; margin-top: 10px;">The concept map contains detailed answers for all 10 questions from the textbook.</p>
+            </div>
+            
+            <div class="card">
+                <h4>Q1: Major Organs + One Function Each</h4>
+                <p><strong>Answer within concept map:</strong> Section 1 (Green) - 8 organs with specific functions</p>
+                <p style="margin-top: 10px; padding: 10px; background: #e8f6f3; border-radius: 5px;">
+                    <strong>Example:</strong> Oral Cavity - Mechanical breakdown begins; Salivary Glands - Produce saliva with amylase; Esophagus - Transport food to stomach...
+                </p>
+            </div>
+            
+            <div class="card">
+                <h4>Q2: Accessory Organs + Functions/Enzymes</h4>
+                <p><strong>Answer within concept map:</strong> Section 2 (Purple) - Liver, Gallbladder, Pancreas with enzymes</p>
+            </div>
+            
+            <div class="card">
+                <h4>Q3-6: Processes (Ingestion, Digestion, Absorption, Elimination)</h4>
+                <p><strong>Answer within concept map:</strong> Sections 3-6 (Blue) - Detailed step-by-step processes</p>
+            </div>
+            
+            <div class="card">
+                <h4>Q7: Mechanical vs Chemical Breakdown</h4>
+                <p><strong>Answer within concept map:</strong> Section 7 (Yellow) - Comparison table with examples</p>
+            </div>
+            
+            <div class="card">
+                <h4>Q8-10: Organ Details (Stomach, Small Intestine, Large Intestine)</h4>
+                <p><strong>Answer within concept map:</strong> Sections 8-10 (Red) - Comprehensive organ analysis</p>
+            </div>
+        </section>
+        
+        <section id="tools">
+            <h2>🛠️ Study Tools & Methods</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎴</div>
+                        <h3>Flashcard System</h3>
+                    </div>
+                    <p><strong>Anki Digital Flashcards</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>50 medical terminology cards</li>
+                        <li>Organ function matching cards</li>
+                        <li>Enzyme-substrate pairs</li>
+                        <li>Process sequence cards</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <h3>Progress Tracking</h3>
+                    </div>
+                    <p><strong>Weekly Assessment Metrics</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Terminology accuracy (%)</li>
+                        <li>Diagram labeling speed</li>
+                        <li>Concept map complexity</li>
+                        <li>Question completion rate</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">⏰</div>
+                        <h3>Time Management</h3>
+                    </div>
+                    <p><strong>22 Hours/Week Schedule</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Daily: 30-min terminology review</li>
+                        <li>3x/week: 60-min chapter reading</li>
+                        <li>Daily: 30-min diagram practice</li>
+                        <li>Weekends: 2-3 hour review</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="downloads">
+            <h2>📥 Download All Materials</h2>
+            <div class="download-section">
+                <h3>Complete Package for Success</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Ultra-Detailed Concept Map</h4>
+                        <p>Color-coded, answers all 10 questions</p>
+                        <a href="katherine_ultra_detailed_concept_map.md" class="btn" style="background: #27ae60;">Download</a>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>6-Week Learning Plan</h4>
+                        <p>Daily schedule + study methods</p>
+                        <a href="katherine_comprehensive_learning_plan.md" class="btn" style="background: #3498db;">Download</a>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Category Analysis</h4>
+                        <p>6 categories of questions answered</p>
+                        <a href="katherine_6_categories_answers.md" class="btn" style="background: #9b59b6;">Download</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="next-steps">
+            <h2>🚀 Next Steps for Katherine</h2>
+            <div class="card">
+                <h3>Immediate Actions (Week 1)</h3>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Create Anki deck</strong> with 50 medical terminology cards</li>
+                    <li><strong>Set up concept map</strong> template (digital or paper)</li>
+                    <li><strong>Schedule Week 1</strong> using the provided time blocks</li>
+                    <li><strong>Gather materials</strong>: Textbook, diagrams, experiment supplies</li>
+                    <li><strong>Take baseline assessment</strong> to measure starting point</li>
+                </ol>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #fef9e7; border-radius: 8px;">
+                    <h4 style="color: #f39c12;">🎯 Success Metrics (Week 1)</h4>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>✅ 50 flashcards created and reviewed</li>
+                        <li>✅ Concept map Level 1 complete</li>
+                        <li>✅ Daily study schedule established</li>
+                        <li>✅ Experiment materials ready</li>
+                        <li>✅ Baseline assessment completed</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Created with AI assistance • Updated: February 10, 2026 • Based on Goodheart-Willcox Anatomy & Physiology Textbook</p>
+            <p>For Katherine's 10th Grade Science Success • <a href="index.html" style="color: #0366d6;">Back to Home</a></p>
+        </footer>
+    </div>
+</body>
+</html>
