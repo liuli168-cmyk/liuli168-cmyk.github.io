@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Option Prices</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .stock-price-box {
+            background: #1a1f3a;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .stock-price-box label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .stock-price-box input {
+            width: 200px;
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid #2a2f4a;
+            border-radius: 8px;
+            background: #0a0e27;
+            color: #e0e0e0;
+        }
+        
+        .positions-grid {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .position-card {
+            background: #1a1f3a;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #2a2f4a;
+        }
+        
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #2a2f4a;
+        }
+        
+        .strike-info {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .exp-date {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        
+        .price-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-group input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #2a2f4a;
+            border-radius: 8px;
+            background: #0a0e27;
+            color: #e0e0e0;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .save-btn {
+            width: 100%;
+            padding: 18px;
+            margin-top: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .success-message {
+            display: none;
+            padding: 20px;
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid #4ade80;
+            border-radius: 8px;
+            color: #4ade80;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .timestamp {
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Update Option Prices</h1>
+            <p>Enter current prices from your broker</p>
+        </div>
+        
+        <div class="stock-price-box">
+            <label>Current TSLA Stock Price:</label>
+            <input type="number" id="stockPrice" step="0.01" placeholder="410.63">
+        </div>
+        
+        <div class="positions-grid" id="positionsGrid"></div>
+        
+        <button class="save-btn" onclick="saveData()">💾 Save & Generate JSON</button>
+        
+        <div class="success-message" id="successMessage">
+            ✅ Data saved! Copy the JSON below and save to option_prices.json
+        </div>
+        
+        <div class="timestamp" id="timestamp"></div>
+        
+        <div id="jsonOutput" style="margin-top: 20px;"></div>
+    </div>
+    
+    <script>
+        const positions = [
+            { strike: 380, expiration: '2026-06-17', contracts: 5 },
+            { strike: 380, expiration: '2027-03-19', contracts: 6 },
+            { strike: 390, expiration: '2027-03-19', contracts: 2 },
+            { strike: 400, expiration: '2026-12-18', contracts: 1 },
+            { strike: 400, expiration: '2027-03-19', contracts: 1 },
+            { strike: 410, expiration: '2027-06-17', contracts: 1 },
+            { strike: 420, expiration: '2027-01-15', contracts: 3 },
+            { strike: 430, expiration: '2026-08-21', contracts: 2 },
+            { strike: 440, expiration: '2027-06-17', contracts: 2 },
+            { strike: 445, expiration: '2026-04-17', contracts: 1 },
+            { strike: 450, expiration: '2026-03-20', contracts: 1 }
+        ];
+        
+        function renderPositions() {
+            const grid = document.getElementById('positionsGrid');
+            
+            positions.forEach((pos, idx) => {
+                const card = document.createElement('div');
+                card.className = 'position-card';
+                card.innerHTML = `
+                    <div class="position-header">
+                        <div>
+                            <div class="strike-info">$${pos.strike} Call</div>
+                            <div class="exp-date">${pos.expiration} · ${pos.contracts} contracts</div>
+                        </div>
+                    </div>
+                    <div class="price-inputs">
+                        <div class="input-group">
+                            <label>Bid</label>
+                            <input type="number" step="0.01" id="bid_${idx}" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>Ask</label>
+                            <input type="number" step="0.01" id="ask_${idx}" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>Last</label>
+                            <input type="number" step="0.01" id="last_${idx}" placeholder="0.00">
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        
+        function saveData() {
+            const stockPrice = parseFloat(document.getElementById('stockPrice').value);
+            
+            if (!stockPrice) {
+                alert('Please enter stock price');
+                return;
+            }
+            
+            const result = {
+                timestamp: new Date().toISOString(),
+                stock_price: stockPrice,
+                positions: []
+            };
+            
+            positions.forEach((pos, idx) => {
+                const bid = parseFloat(document.getElementById(`bid_${idx}`).value) || 0;
+                const ask = parseFloat(document.getElementById(`ask_${idx}`).value) || 0;
+                const last = parseFloat(document.getElementById(`last_${idx}`).value) || 0;
+                
+                result.positions.push({
+                    strike: pos.strike,
+                    expiration: pos.expiration,
+                    contracts: pos.contracts,
+                    bid: bid,
+                    ask: ask,
+                    last: last,
+                    mid: ((bid + ask) / 2).toFixed(2)
+                });
+            });
+            
+            // Display JSON
+            const jsonOutput = document.getElementById('jsonOutput');
+            jsonOutput.innerHTML = `
+                <div style="background: #1a1f3a; padding: 20px; border-radius: 12px; border: 1px solid #2a2f4a;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <strong>Generated JSON:</strong>
+                        <button onclick="copyToClipboard()" style="padding: 5px 15px; background: #667eea; border: none; border-radius: 6px; color: white; cursor: pointer;">Copy</button>
+                    </div>
+                    <pre id="jsonCode" style="background: #0a0e27; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 12px; color: #4ade80;">${JSON.stringify(result, null, 2)}</pre>
+                </div>
+            `;
+            
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('timestamp').textContent = 'Last updated: ' + new Date().toLocaleString();
+            
+            // Auto-download
+            const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'option_prices.json';
+            a.click();
+        }
+        
+        function copyToClipboard() {
+            const code = document.getElementById('jsonCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Copied to clipboard!');
+            });
+        }
+        
+        renderPositions();
+    </script>
+</body>
+</html>
