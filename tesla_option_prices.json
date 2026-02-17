@@ -1,0 +1,138 @@
+{
+  "timestamp": "2026-02-17T10:00:00",
+  "stock_price": 410.63,
+  "positions": [
+    {
+      "strike": 380,
+      "expiration": "2026-06-17",
+      "contracts": 5,
+      "bid": 48.50,
+      "ask": 50.20,
+      "last": 49.30,
+      "mid": 49.35,
+      "volume": 125,
+      "openInterest": 2340,
+      "iv": 45.3
+    },
+    {
+      "strike": 380,
+      "expiration": "2027-03-19",
+      "contracts": 6,
+      "bid": 62.10,
+      "ask": 64.30,
+      "last": 63.15,
+      "mid": 63.20,
+      "volume": 89,
+      "openInterest": 1890,
+      "iv": 48.7
+    },
+    {
+      "strike": 390,
+      "expiration": "2027-03-19",
+      "contracts": 2,
+      "bid": 55.80,
+      "ask": 57.90,
+      "last": 56.70,
+      "mid": 56.85,
+      "volume": 67,
+      "openInterest": 1456,
+      "iv": 47.2
+    },
+    {
+      "strike": 400,
+      "expiration": "2026-12-18",
+      "contracts": 1,
+      "bid": 38.20,
+      "ask": 39.80,
+      "last": 39.00,
+      "mid": 39.00,
+      "volume": 234,
+      "openInterest": 3567,
+      "iv": 44.8
+    },
+    {
+      "strike": 400,
+      "expiration": "2027-03-19",
+      "contracts": 1,
+      "bid": 49.30,
+      "ask": 51.20,
+      "last": 50.20,
+      "mid": 50.25,
+      "volume": 156,
+      "openInterest": 2234,
+      "iv": 46.5
+    },
+    {
+      "strike": 410,
+      "expiration": "2027-06-17",
+      "contracts": 1,
+      "bid": 45.60,
+      "ask": 47.40,
+      "last": 46.50,
+      "mid": 46.50,
+      "volume": 98,
+      "openInterest": 1789,
+      "iv": 45.9
+    },
+    {
+      "strike": 420,
+      "expiration": "2027-01-15",
+      "contracts": 3,
+      "bid": 38.90,
+      "ask": 40.60,
+      "last": 39.70,
+      "mid": 39.75,
+      "volume": 189,
+      "openInterest": 2876,
+      "iv": 44.1
+    },
+    {
+      "strike": 430,
+      "expiration": "2026-08-21",
+      "contracts": 2,
+      "bid": 22.30,
+      "ask": 23.70,
+      "last": 23.00,
+      "mid": 23.00,
+      "volume": 345,
+      "openInterest": 4567,
+      "iv": 42.5
+    },
+    {
+      "strike": 440,
+      "expiration": "2027-06-17",
+      "contracts": 2,
+      "bid": 35.20,
+      "ask": 36.80,
+      "last": 36.00,
+      "mid": 36.00,
+      "volume": 123,
+      "openInterest": 1987,
+      "iv": 43.7
+    },
+    {
+      "strike": 445,
+      "expiration": "2026-04-17",
+      "contracts": 1,
+      "bid": 15.80,
+      "ask": 16.90,
+      "last": 16.30,
+      "mid": 16.35,
+      "volume": 234,
+      "openInterest": 3456,
+      "iv": 41.2
+    },
+    {
+      "strike": 450,
+      "expiration": "2026-03-20",
+      "contracts": 1,
+      "bid": 8.50,
+      "ask": 9.30,
+      "last": 8.90,
+      "mid": 8.90,
+      "volume": 567,
+      "openInterest": 5678,
+      "iv": 39.8
+    }
+  ]
+}

@@ -94,7 +94,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
         
@@ -139,7 +139,7 @@
         
         .summary-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -152,7 +152,7 @@
         }
         
         .card-title {
-            font-size: 14px;
+            font-size: 12px;
             color: #9ca3af;
             margin-bottom: 10px;
             text-transform: uppercase;
@@ -160,7 +160,7 @@
         }
         
         .card-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
         }
         
@@ -179,13 +179,14 @@
         .positions-table {
             background: #1a1f3a;
             border-radius: 12px;
-            overflow: hidden;
+            overflow-x: auto;
             border: 1px solid #2a2f4a;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 13px;
         }
         
         thead {
@@ -193,25 +194,26 @@
         }
         
         th {
-            padding: 15px;
+            padding: 12px 10px;
             text-align: left;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 11px;
             color: #9ca3af;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
         
         td {
-            padding: 15px;
+            padding: 12px 10px;
             border-top: 1px solid #2a2f4a;
         }
         
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
         }
         
@@ -284,6 +286,26 @@
         .logout-btn:hover {
             background: rgba(248, 113, 113, 0.3);
         }
+        
+        .price-cell {
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+        
+        .buyback-cost {
+            font-weight: 600;
+        }
+        
+        .buyback-good {
+            color: #4ade80;
+        }
+        
+        .buyback-ok {
+            color: #fbbf24;
+        }
+        
+        .buyback-bad {
+            color: #f87171;
+        }
     </style>
 </head>
 <body>
@@ -312,7 +334,7 @@
             <div class="header">
                 <div>
                     <h1>🚗 Tesla Covered Call Dashboard</h1>
-                    <p style="margin-top: 5px; opacity: 0.9;">Live Position Tracking</p>
+                    <p style="margin-top: 5px; opacity: 0.9;">Live Position Tracking with Option Prices</p>
                 </div>
                 <div class="price-box">
                     <div class="current-price" id="currentPrice">$410.63</div>
@@ -339,6 +361,10 @@
                     <div class="card-title">Total Shares</div>
                     <div class="card-value" id="totalShares">2,500</div>
                 </div>
+                <div class="card">
+                    <div class="card-title">Total Buyback Cost</div>
+                    <div class="card-value" id="totalBuyback">$0</div>
+                </div>
             </div>
             
             <div class="positions-table">
@@ -346,11 +372,16 @@
                     <thead>
                         <tr>
                             <th>Strike</th>
-                            <th>Expiration</th>
-                            <th>Contracts</th>
-                            <th>Days Left</th>
+                            <th>Exp</th>
+                            <th>Qty</th>
+                            <th>Days</th>
                             <th>Status</th>
-                            <th>Distance</th>
+                            <th>Bid</th>
+                            <th>Ask</th>
+                            <th>Last</th>
+                            <th>Mid</th>
+                            <th>Buyback Cost</th>
+                            <th>IV%</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -392,9 +423,7 @@
         function showDashboard() {
             document.getElementById('passwordScreen').style.display = 'none';
             document.getElementById('dashboardContainer').style.display = 'block';
-            updateDashboard();
-            fetchTeslaPrice();
-            setInterval(fetchTeslaPrice, 30000);
+            loadOptionPrices();
         }
         
         // Logout
@@ -410,21 +439,8 @@
             }
         });
         
-        const positions = [
-            { strike: 380, expiration: '2026-06-17', contracts: 5 },
-            { strike: 380, expiration: '2027-03-19', contracts: 6 },
-            { strike: 390, expiration: '2027-03-19', contracts: 2 },
-            { strike: 400, expiration: '2026-12-18', contracts: 1 },
-            { strike: 400, expiration: '2027-03-19', contracts: 1 },
-            { strike: 410, expiration: '2027-06-17', contracts: 1 },
-            { strike: 420, expiration: '2027-01-15', contracts: 3 },
-            { strike: 430, expiration: '2026-08-21', contracts: 2 },
-            { strike: 440, expiration: '2027-06-17', contracts: 2 },
-            { strike: 445, expiration: '2026-04-17', contracts: 1 },
-            { strike: 450, expiration: '2026-03-20', contracts: 1 }
-        ];
-        
         let currentPrice = 410.63;
+        let optionData = null;
         
         function calculateDaysToExpiration(expDate) {
             const today = new Date();
@@ -450,12 +466,15 @@
                    days < 90 ? 'days-warning' : 'days-safe';
         }
         
-        function getActionSuggestion(strike, days, status) {
+        function getActionSuggestion(strike, days, status, buybackCost, contracts) {
             if (status === 'ITM' && strike < 400) {
                 return '⚠️ Roll Up';
             }
+            if (buybackCost / contracts < 10 && status === 'ITM') {
+                return '💰 Buy Back?';
+            }
             if (status === 'ITM' && days < 60) {
-                return '⏰ Watch Closely';
+                return '⏰ Watch';
             }
             if (status === 'OTM') {
                 return '✅ Hold';
@@ -463,31 +482,67 @@
             return '👀 Monitor';
         }
         
+        function getBuybackClass(costPerContract) {
+            if (costPerContract < 10) return 'buyback-good';
+            if (costPerContract < 20) return 'buyback-ok';
+            return 'buyback-bad';
+        }
+        
+        async function loadOptionPrices() {
+            try {
+                // Try to load from GitHub Pages first (for deployed version)
+                let response = await fetch('https://liuli168-cmyk.github.io/tesla_option_prices.json');
+                
+                // Fallback to local file
+                if (!response.ok) {
+                    response = await fetch('option_prices.json');
+                }
+                
+                optionData = await response.json();
+                currentPrice = optionData.stock_price;
+                
+                document.getElementById('currentPrice').textContent = `$${currentPrice.toFixed(2)}`;
+                document.getElementById('priceChange').textContent = `Updated ${new Date(optionData.timestamp).toLocaleString()}`;
+                
+                updateDashboard();
+                
+            } catch (error) {
+                console.error('Error loading option prices:', error);
+                document.getElementById('priceChange').textContent = 'Unable to load option prices';
+            }
+        }
+        
         function updateDashboard() {
+            if (!optionData) return;
+            
             const tbody = document.getElementById('positionsBody');
             tbody.innerHTML = '';
             
             let itmCount = 0;
             let otmCount = 0;
+            let totalBuyback = 0;
             const alerts = [];
             
-            positions.sort((a, b) => {
+            optionData.positions.sort((a, b) => {
                 const daysA = calculateDaysToExpiration(a.expiration);
                 const daysB = calculateDaysToExpiration(b.expiration);
                 return daysA - daysB;
             });
             
-            positions.forEach(pos => {
+            optionData.positions.forEach(pos => {
                 const days = calculateDaysToExpiration(pos.expiration);
                 const status = getStatus(pos.strike, currentPrice);
-                const distance = (currentPrice - pos.strike).toFixed(2);
-                const action = getActionSuggestion(pos.strike, days, status);
+                const buybackCost = pos.mid * pos.contracts * 100;
+                const costPerContract = pos.mid * 100;
+                const action = getActionSuggestion(pos.strike, days, status, buybackCost, pos.contracts);
                 
                 if (status === 'ITM') itmCount += pos.contracts;
                 else if (status === 'OTM') otmCount += pos.contracts;
                 
+                totalBuyback += buybackCost;
+                
                 if (status === 'ITM' && days < 45) {
-                    alerts.push(`${pos.contracts} contract(s) at $${pos.strike} expiring in ${days} days`);
+                    alerts.push(`${pos.contracts} contract(s) at $${pos.strike} expiring in ${days} days - Buyback: $${buybackCost.toLocaleString()}`);
                 }
                 
                 const row = `
@@ -497,7 +552,15 @@
                         <td>${pos.contracts}</td>
                         <td class="days-to-exp ${getDaysClass(days)}">${days}d</td>
                         <td><span class="status-badge ${getStatusClass(status)}">${status}</span></td>
-                        <td>${distance > 0 ? '+' : ''}$${distance}</td>
+                        <td class="price-cell">$${pos.bid.toFixed(2)}</td>
+                        <td class="price-cell">$${pos.ask.toFixed(2)}</td>
+                        <td class="price-cell">$${pos.last.toFixed(2)}</td>
+                        <td class="price-cell"><strong>$${pos.mid.toFixed(2)}</strong></td>
+                        <td class="buyback-cost ${getBuybackClass(costPerContract)}">
+                            $${buybackCost.toLocaleString()} 
+                            <span style="font-size: 11px; opacity: 0.7;">($${costPerContract.toFixed(0)}/ea)</span>
+                        </td>
+                        <td>${pos.iv}%</td>
                         <td>${action}</td>
                     </tr>
                 `;
@@ -506,6 +569,7 @@
             
             document.getElementById('itmContracts').textContent = itmCount;
             document.getElementById('otmContracts').textContent = otmCount;
+            document.getElementById('totalBuyback').textContent = `$${totalBuyback.toLocaleString()}`;
             
             const alertContainer = document.getElementById('alertContainer');
             if (alerts.length > 0) {
@@ -522,31 +586,8 @@
             document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
         }
         
-        async function fetchTeslaPrice() {
-            try {
-                const response = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/TSLA?interval=1m&range=1d');
-                const data = await response.json();
-                const price = data.chart.result[0].meta.regularMarketPrice;
-                
-                if (price) {
-                    const prevPrice = currentPrice;
-                    currentPrice = price;
-                    
-                    document.getElementById('currentPrice').textContent = `$${price.toFixed(2)}`;
-                    
-                    const change = price - prevPrice;
-                    const changePercent = ((change / prevPrice) * 100).toFixed(2);
-                    const changeEl = document.getElementById('priceChange');
-                    changeEl.textContent = `${change >= 0 ? '+' : ''}$${change.toFixed(2)} (${change >= 0 ? '+' : ''}${changePercent}%)`;
-                    changeEl.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
-                    
-                    updateDashboard();
-                }
-            } catch (error) {
-                console.log('Using manual price update');
-                document.getElementById('priceChange').textContent = 'Manual mode - refresh to update';
-            }
-        }
+        // Auto-refresh every 5 minutes
+        setInterval(loadOptionPrices, 300000);
     </script>
 </body>
 </html>
