@@ -3,52 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesla Covered Call Calculator v3 — Feb 20, 2026 (Night Refresh)</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Tesla Covered Call Calculator v3</title>
     <style>
-        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; margin-bottom: 20px; }
-        .card-header { background: #1f2937; border-bottom: 1px solid #30363d; border-radius: 12px 12px 0 0; padding: 14px 20px; }
-        .card-body { padding: 20px; }
-        h1 { color: #58a6ff; }
-        .lead { color: #8b949e; }
-        .form-control, .form-select { background: #0d1117; border: 1px solid #30363d; color: #e6edf3; }
-        .form-control:focus, .form-select:focus { background: #0d1117; border-color: #58a6ff; color: #e6edf3; box-shadow: 0 0 0 0.25rem rgba(88,166,255,0.25); }
-        .form-label { color: #8b949e; font-size: 0.875rem; }
-        .btn-primary { background: #238636; border-color: #238636; }
-        .btn-primary:hover { background: #2ea043; border-color: #2ea043; }
-        .metric-box { background: #1f2937; border-radius: 10px; padding: 20px; text-align: center; border: 1px solid #30363d; }
-        .metric-value { font-size: 2rem; font-weight: 700; color: #3fb950; }
-        .metric-label { color: #8b949e; font-size: 0.8rem; margin-top: 4px; }
-        .strike-row { padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
-        .strike-row:hover { border-color: #58a6ff; }
-        .strike-conservative { background: #0d2818; border-left: 4px solid #3fb950; }
-        .strike-moderate { background: #1a2d0d; border-left: 4px solid #ffa657; }
-        .strike-aggressive { background: #2d1f0d; border-left: 4px solid #f85149; }
-        .strike-selected { border: 2px solid #58a6ff !important; }
-        .badge-conservative { background: #3fb950; color: #000; }
-        .badge-moderate { background: #ffa657; color: #000; }
-        .badge-aggressive { background: #f85149; color: #fff; }
-        .live-price { color: #3fb950; font-size: 1.5rem; font-weight: 700; }
-        .data-timestamp { color: #8b949e; font-size: 0.75rem; }
-        .income-highlight { color: #ffa657; font-weight: 700; }
-        .chart-container { height: 280px; }
-        .alert-dark { background: #1f2937; border: 1px solid #30363d; color: #e6edf3; }
-        table { color: #e6edf3; }
-        .table-dark { --bs-table-bg: #161b22; --bs-table-border-color: #30363d; }
-        .table-hover > tbody > tr:hover { background: #1f2937; }
-        .otm-percent { color: #58a6ff; font-size: 0.8rem; }
-        select option { background: #0d1117; color: #e6edf3; }
-        .roll-card { background: #1a1f2e; border: 1px solid #30363d; border-radius: 10px; padding: 16px; margin-bottom: 10px; }
-        .roll-card.best { border-color: #ffa657; }
-        .tax-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #30363d; }
-        .accum-bar { height: 20px; background: #30363d; border-radius: 10px; overflow: hidden; margin-top: 8px; }
-        .accum-fill { height: 100%; background: linear-gradient(90deg, #58a6ff, #3fb950); border-radius: 10px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.75rem; font-weight: 700; }
-        .new-badge { background: #1a3a1a; border: 1px solid #3fb950; color: #3fb950; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, sans-serif; background: #0d1117; color: #e6edf3; }
+        body.login-mode { height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: #161b22; border: 1px solid #30363d; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); max-width: 400px; width: 100%; text-align: center; }
+        .locked-icon { font-size: 3rem; margin-bottom: 20px; }
+        h1 { color: #58a6ff; margin-bottom: 10px; font-size: 1.4rem; }
+        p { color: #8b949e; margin-bottom: 25px; }
+        .password-input { width: 100%; padding: 14px; border: 1px solid #30363d; border-radius: 8px; font-size: 1rem; margin-bottom: 15px; background: #0d1117; color: #e6edf3; transition: border-color 0.3s; }
+        .password-input:focus { outline: none; border-color: #58a6ff; }
+        .submit-btn { width: 100%; padding: 14px; background: #238636; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+        .submit-btn:hover { background: #2ea043; }
+        .error { color: #f85149; margin-top: 10px; display: none; font-size: 0.9rem; }
+        #mainContent { display: none; }
     </style>
 </head>
-<body>
+<body class="login-mode" id="pageBody">
+
+    <!-- Login Gate -->
+    <div class="login-box" id="loginBox">
+        <div class="locked-icon">🔒</div>
+        <h1>Tesla Covered Call Calculator</h1>
+        <p>Private financial tool — enter password to access</p>
+        <input type="password" id="passwordInput" class="password-input" placeholder="Enter password" autocomplete="off">
+        <button class="submit-btn" id="submitBtn">Unlock →</button>
+        <div class="error" id="errorMsg">Incorrect password. Try again.</div>
+    </div>
+
+    <!-- Main Content (hidden until unlocked) -->
+    <div id="mainContent">
+
 <div class="container-fluid">
     <div class="row mb-3">
         <div class="col-12">
@@ -590,5 +576,44 @@ populateTable();
 buildIncomeChart();
 buildProjectionChart();
 </script>
+
+    </div>
+
+    <script>
+        const CORRECT_PASSWORD = "781006";
+        const submitBtn = document.getElementById('submitBtn');
+        const passwordInput = document.getElementById('passwordInput');
+        const errorMsg = document.getElementById('errorMsg');
+        const loginBox = document.getElementById('loginBox');
+        const mainContent = document.getElementById('mainContent');
+        const pageBody = document.getElementById('pageBody');
+
+        submitBtn.addEventListener('click', checkPassword);
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        function checkPassword() {
+            const entered = passwordInput.value.trim();
+            if (entered === CORRECT_PASSWORD) {
+                loginBox.style.display = 'none';
+                mainContent.style.display = 'block';
+                pageBody.classList.remove('login-mode');
+                pageBody.style.background = '#0d1117';
+                sessionStorage.setItem('tsla_calc_auth', '1');
+            } else {
+                errorMsg.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+
+        // Auto-unlock if already authenticated this session
+        if (sessionStorage.getItem('tsla_calc_auth') === '1') {
+            loginBox.style.display = 'none';
+            mainContent.style.display = 'block';
+            pageBody.classList.remove('login-mode');
+        }
+    </script>
 </body>
 </html>
