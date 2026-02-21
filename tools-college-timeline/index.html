@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katherine's College Timeline 2028 v2</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; margin-bottom: 20px; }
+        .card-header { background: #1f2937; border-bottom: 1px solid #30363d; border-radius: 12px 12px 0 0; padding: 14px 20px; }
+        .card-body { padding: 20px; }
+        h1 { color: #a855f7; }
+        .lead { color: #8b949e; }
+        .metric-box { background: #1f2937; border-radius: 10px; padding: 20px; text-align: center; border: 1px solid #30363d; }
+        .metric-value { font-size: 2rem; font-weight: 700; }
+        .metric-label { color: #8b949e; font-size: 0.8rem; margin-top: 4px; }
+        .timeline-item { padding: 16px; border-radius: 10px; margin-bottom: 12px; border-left: 4px solid; }
+        .phase-1 { background: #1a1a2e; border-left-color: #a855f7; }
+        .phase-2 { background: #0d2818; border-left-color: #3fb950; }
+        .phase-3 { background: #1a2d0d; border-left-color: #ffa657; }
+        .phase-4 { background: #2d0d1a; border-left-color: #ff7eb6; }
+        .critical { background: #2d1010; border-left-color: #f85149; }
+        .school-card { background: #1f2937; border-radius: 10px; padding: 20px; border: 1px solid #30363d; margin-bottom: 16px; }
+        .admit-pct { font-size: 2.5rem; font-weight: 700; }
+        .progress { height: 12px; background: #30363d; border-radius: 6px; }
+        .chart-container { height: 260px; }
+        .timestamp { color: #8b949e; font-size: 0.75rem; }
+        .action-item { background: #1f2937; border-radius: 8px; padding: 10px 14px; margin-bottom: 6px; display: flex; align-items: flex-start; gap: 10px; }
+        .action-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+        .sat-score-box { background: #1f2937; border-radius: 8px; padding: 12px; text-align: center; border: 1px solid #30363d; }
+        .badge-phase1 { background: #a855f7; color: white; }
+        .badge-phase2 { background: #3fb950; color: white; }
+        .badge-phase3 { background: #ffa657; color: black; }
+        .new-badge { background: #1a3a1a; border: 1px solid #3fb950; color: #3fb950; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; }
+        .schol-card { background: #1f2937; border-radius: 8px; padding: 14px; margin-bottom: 10px; border-left: 4px solid #a855f7; }
+        .checkbox-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; background: #1f2937; border-radius: 8px; margin-bottom: 6px; cursor: pointer; }
+        .checkbox-item input { margin-top: 3px; accent-color: #a855f7; }
+        .checkbox-item.done { opacity: 0.6; }
+        .tab-btn { background: #1f2937; border: 1px solid #30363d; color: #8b949e; border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+        .tab-btn.active { background: #a855f7; border-color: #a855f7; color: white; }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h1 class="mb-1">🎓 Katherine's College Timeline <span style="font-size:0.5em;color:#8b949e">v2</span></h1>
+            <p class="lead mb-0">2028 Applications — Class of 2032 · Powered by Lilly's Chief of Staff</p>
+            <div class="timestamp mt-1">Night Shift Refresh: Feb 20, 2026 — 10:15 PM CST · 11th Grade (Junior Year) · ~29 months to applications · 878 days to May 1, 2028 Decision Day · ⚠️ SAT Registration Deadline: Mar 15 (23 days!)</div>
+        </div>
+    </div>
+
+    <!-- Countdown Metrics -->
+    <div class="card">
+        <div class="card-body py-3">
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#a855f7" id="monthsToApp">29</div>
+                        <div class="metric-label">Months to EA Deadline (Nov 1, 2027)</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#ffa657">Sep 2026</div>
+                        <div class="metric-label">First SAT Target Date</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#3fb950">11th</div>
+                        <div class="metric-label">Current Grade (Junior)</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#58a6ff" id="daysToDecision">878</div>
+                        <div class="metric-label">Days to May 1, 2028 Decision Day</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- School Comparison -->
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h6 class="mb-0">🏫 School Comparison</h6>
+                    <div style="display:flex;gap:6px">
+                        <button class="tab-btn active" onclick="showSchools('texas')" id="tabTX">Texas Schools</button>
+                        <button class="tab-btn" onclick="showSchools('national')" id="tabNat">Stretch</button>
+                    </div>
+                </div>
+                <div class="card-body" id="schoolContent">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- SAT Score Guide NEW -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h6 class="mb-0">📝 SAT Score Guide <span class="new-badge ms-2">NEW</span></h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2 mb-3">
+                        <div class="col-6"><div class="sat-score-box" style="border-color:#f85149"><div style="color:#f85149;font-weight:700;font-size:1.3rem">&lt;1100</div><div class="timestamp">Below avg · Safety schools only</div></div></div>
+                        <div class="col-6"><div class="sat-score-box" style="border-color:#ffa657"><div style="color:#ffa657;font-weight:700;font-size:1.3rem">1100–1300</div><div class="timestamp">UT Austin eligible (most majors)</div></div></div>
+                        <div class="col-6"><div class="sat-score-box" style="border-color:#3fb950"><div style="color:#3fb950;font-weight:700;font-size:1.3rem">1350–1450</div><div class="timestamp">Strong UT · Rice competitive</div></div></div>
+                        <div class="col-6"><div class="sat-score-box" style="border-color:#a855f7"><div style="color:#a855f7;font-weight:700;font-size:1.3rem">1500+</div><div class="timestamp">Rice merit scholarship range</div></div></div>
+                    </div>
+                    <div style="background:#1f2937;border-radius:8px;padding:12px">
+                        <div style="color:#a855f7;font-weight:700;margin-bottom:6px">🎯 Katherine's Target: 1,450+ by Oct 2026</div>
+                        <div style="font-size:0.85rem;color:#c9d1d9">
+                            <div>Reading: 700+ (focus: evidence-based passages)</div>
+                            <div>Math: 750+ (focus: advanced algebra, geometry)</div>
+                            <div>Recommended prep: Khan Academy + 3 months dedicated study</div>
+                        </div>
+                    </div>
+                    <div class="mt-3" style="background:#0d2818;border-radius:8px;padding:12px;border:1px solid #3fb950">
+                        <div style="color:#3fb950;font-size:0.85rem"><strong>💰 SAT Score → Scholarship Impact</strong></div>
+                        <div class="timestamp">Rice 1500+ SAT: Potential $40,000–$60,000/yr merit scholarship</div>
+                        <div class="timestamp">UT Austin 1400+ SAT: Automatic qualification for honors programs</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline + Checklist -->
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h6 class="mb-0">📅 Preparation Timeline</h6>
+                    <div class="timestamp">Feb 2026 → May 2028</div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2"><span class="badge badge-phase1 rounded-pill">PHASE 1 — NOW (Spring 2026)</span></div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#a855f7"></div>
+                        <div><strong>SAT Diagnostic</strong> — Take a free full-length practice test (Khan Academy). Identify weak areas. Set baseline score by March 15, 2026.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#a855f7"></div>
+                        <div><strong>GPA Protection</strong> — Junior year GPA is the most scrutinized by admissions. All A's target. Meet with counselor about weighted GPA calculation.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#a855f7"></div>
+                        <div><strong>AP Exam Prep</strong> — 3–5 AP exams this spring. Aim for 4–5 on each. Strong AP scores = college credit = $$$ saved.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#a855f7"></div>
+                        <div><strong>Leadership Audit</strong> — Document all extracurriculars, leadership roles, volunteer hours. This becomes the application Activities section.</div>
+                    </div>
+
+                    <div class="mb-2 mt-3"><span class="badge badge-phase2 rounded-pill">PHASE 2 — SUMMER 2026</span></div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#3fb950"></div>
+                        <div><strong>SAT Prep Course</strong> — Dedicated 8-week prep. Khan Academy (free) + optional tutor. Target: 1,450+ by first real test.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#3fb950"></div>
+                        <div><strong>College Tours</strong> — Visit UT Austin + Rice University in person. Walk campus, sit in on classes. Gut feelings matter.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#3fb950"></div>
+                        <div><strong>Summer Program / Internship</strong> — Research program, community service, or meaningful job. Gold for college essays.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#3fb950"></div>
+                        <div><strong>SAT Take #1</strong> — September or October 2026. Get official score on record. 2 attempts typical optimal strategy.</div>
+                    </div>
+
+                    <div class="mb-2 mt-3"><span class="badge badge-phase3 rounded-pill" style="background:#ffa657;color:black">PHASE 3 — SENIOR YEAR (Fall 2026–Spring 2027)</span></div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#ffa657"></div>
+                        <div><strong>SAT Retake</strong> — Nov/Dec 2026 if below 1,450. Superscore benefit: colleges take highest section scores across attempts.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#ffa657"></div>
+                        <div><strong>Finalize School List</strong> — 10–12 schools. Recommended breakdown: 2 reach, 5 match, 3 safety. Do not apply to schools you wouldn't attend.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#ffa657"></div>
+                        <div><strong>Common App Essay</strong> — Start drafts by Aug 2027. Choose one of 7 prompts. 650 words. 3–5 revision rounds minimum.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#ffa657"></div>
+                        <div><strong>Recommendation Letters</strong> — Ask 2 teachers + counselor by September 2027. Choose teachers who know Katherine best (not just easy A's).</div>
+                    </div>
+
+                    <div class="mb-2 mt-3"><span class="badge" style="background:#f85149;color:white;border-radius:20px;padding:4px 10px">🚨 PHASE 4 — APPLICATION SEASON (Fall 2027)</span></div>
+                    <div class="action-item" style="border:1px solid #f85149;border-radius:8px">
+                        <div class="action-dot" style="background:#f85149"></div>
+                        <div><strong>⚠️ EA/ED Deadline: Nov 1, 2027</strong> — UT Austin + Rice early action. Apply early = 15–20% higher admit odds. Do not miss this date.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#ff7eb6"></div>
+                        <div><strong>FAFSA Opens Oct 1, 2027</strong> — File the same day it opens. Early FAFSA = more aid. 2026 tax returns needed.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#ff7eb6"></div>
+                        <div><strong>RD Deadline: Jan 1, 2028</strong> — Submit all remaining school apps. No exceptions for late submissions.</div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-dot" style="background:#a855f7"></div>
+                        <div><strong>🎉 Decision Day: May 1, 2028</strong> — Commit to chosen school, send deposit. Celebrate Katherine's hard work!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scholarship Tracker NEW -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h6 class="mb-0">🏆 Scholarship Tracker <span class="new-badge ms-2">NEW</span></h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="schol-card">
+                        <div style="color:#a855f7;font-weight:700">Rice University Merit Aid</div>
+                        <div class="timestamp">Amount: $40,000–$60,000/yr if SAT 1500+</div>
+                        <div class="timestamp">Deadline: Nov 1, 2027 (EA) · Automatic consideration</div>
+                        <div style="margin-top:8px;font-size:0.8rem;color:#c9d1d9">Rice gives exceptional merit aid — a 1500+ SAT score makes Katherine competitive for $160K–$240K over 4 years.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="schol-card" style="border-left-color:#ffa657">
+                        <div style="color:#ffa657;font-weight:700">UT Austin Longhorn Scholars</div>
+                        <div class="timestamp">Amount: $5,000–$20,000/yr based on need/merit</div>
+                        <div class="timestamp">Deadline: Dec 1, 2027 · Apply via ApplyTexas</div>
+                        <div style="margin-top:8px;font-size:0.8rem;color:#c9d1d9">UT Austin's University Honors program + external scholarships. Top 10% auto-admit opens doors to competitive scholarships.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="schol-card" style="border-left-color:#58a6ff">
+                        <div style="color:#58a6ff;font-weight:700">External Scholarships to Target</div>
+                        <div class="timestamp">National Merit: PSAT Oct 2026 → qualifying score</div>
+                        <div class="timestamp">Gates Scholarship: Pell-eligible, GPA 3.3+</div>
+                        <div class="timestamp">Dell Scholars: First-gen focus, $20,000</div>
+                        <div class="timestamp">Jack Kent Cooke: High-achieving, up to $40K/yr</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activities Tracker NEW -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h6 class="mb-0">✅ Junior Year Checklist <span class="new-badge ms-2">NEW</span></h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <h6 style="color:#8b949e;font-size:0.85rem">ACADEMIC</h6>
+                    <div class="checkbox-item" id="chk1" onclick="toggleCheck('chk1')">
+                        <input type="checkbox" id="c1"> <label for="c1" style="cursor:pointer">Take SAT diagnostic test (Feb–Mar 2026)</label>
+                    </div>
+                    <div class="checkbox-item" id="chk2" onclick="toggleCheck('chk2')">
+                        <input type="checkbox" id="c2"> <label for="c2" style="cursor:pointer">Register for AP exams (deadline varies)</label>
+                    </div>
+                    <div class="checkbox-item" id="chk3" onclick="toggleCheck('chk3')">
+                        <input type="checkbox" id="c3"> <label for="c3" style="cursor:pointer">Maintain GPA above 3.8 this semester</label>
+                    </div>
+                    <div class="checkbox-item" id="chk4" onclick="toggleCheck('chk4')">
+                        <input type="checkbox" id="c4"> <label for="c4" style="cursor:pointer">Register for PSAT (Oct 2026) — National Merit qualifying</label>
+                    </div>
+                    <div class="checkbox-item" id="chk5" onclick="toggleCheck('chk5')">
+                        <input type="checkbox" id="c5"> <label for="c5" style="cursor:pointer">Enroll in SAT prep course (summer 2026)</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 style="color:#8b949e;font-size:0.85rem">PLANNING</h6>
+                    <div class="checkbox-item" id="chk6" onclick="toggleCheck('chk6')">
+                        <input type="checkbox" id="c6"> <label for="c6" style="cursor:pointer">Schedule campus tour: UT Austin (Summer 2026)</label>
+                    </div>
+                    <div class="checkbox-item" id="chk7" onclick="toggleCheck('chk7')">
+                        <input type="checkbox" id="c7"> <label for="c7" style="cursor:pointer">Schedule campus tour: Rice University (Summer 2026)</label>
+                    </div>
+                    <div class="checkbox-item" id="chk8" onclick="toggleCheck('chk8')">
+                        <input type="checkbox" id="c8"> <label for="c8" style="cursor:pointer">Start activities/leadership log document</label>
+                    </div>
+                    <div class="checkbox-item" id="chk9" onclick="toggleCheck('chk9')">
+                        <input type="checkbox" id="c9"> <label for="c9" style="cursor:pointer">Research summer programs (apply by March 2026)</label>
+                    </div>
+                    <div class="checkbox-item" id="chk10" onclick="toggleCheck('chk10')">
+                        <input type="checkbox" id="c10"> <label for="c10" style="cursor:pointer">Set up 529 plan / review college savings account</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3 d-flex align-items-center gap-2">
+                <div style="font-size:0.85rem;color:#8b949e">Progress:</div>
+                <div style="flex:1;background:#30363d;border-radius:6px;height:10px">
+                    <div id="checklistProgress" style="width:0%;background:#a855f7;border-radius:6px;height:10px;transition:width 0.3s"></div>
+                </div>
+                <div id="checklistPct" style="color:#a855f7;font-size:0.85rem;min-width:40px">0/10</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Savings Plan + Tesla Link -->
+    <div class="card">
+        <div class="card-header"><h6 class="mb-0">💰 College Savings & Tesla Connection</h6></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#ffa657;font-size:1.6rem">$119,609</div>
+                        <div class="metric-label">UT Austin 4-Year Total</div>
+                        <div class="timestamp mt-2">$2,500/month → fully funded ✅</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#a855f7;font-size:1.6rem">$354,591</div>
+                        <div class="metric-label">Rice University 4-Year Total</div>
+                        <div class="timestamp mt-2">With $160K merit aid → ~$194K net</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#3fb950;font-size:1.6rem">5.5 mo</div>
+                        <div class="metric-label">TSLA Income to Fund UT Austin</div>
+                        <div class="timestamp mt-2">$21,750/mo × 5.5 = $119,625 🤯</div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert mt-3 mb-0" style="background:#1f2937;border:1px solid #a855f7;color:#e6edf3;border-radius:8px">
+                <strong style="color:#a855f7">💡 Huang Rong Insight (Feb 20):</strong> Lilly's Tesla covered call income ($21,750/month, Mar 20 $440 call) would fully fund UT Austin in <strong>5.5 months</strong>, and Rice University's net cost (after merit aid) in <strong>~9 months</strong> of covered call income. The Tesla strategy doesn't just build wealth — it directly pays for Katherine's future. Set aside 2 months of covered call income ($43,500) into a dedicated 529 college savings account starting today.
+            </div>
+        </div>
+    </div>
+
+    <!-- Cost Chart -->
+    <div class="card">
+        <div class="card-header"><h6 class="mb-0">📊 4-Year Cost Comparison</h6></div>
+        <div class="card-body">
+            <div class="chart-container">
+                <canvas id="costChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center timestamp py-2">Built by Huang Rong Night Shift · Refreshed Feb 20, 2026 — 2:00 AM CST · v2.0 · Katherine Class of 2032 🎓</div>
+</div>
+
+<script>
+const texasSchools = [
+    { name: '🤘 UT Austin', color: '#ffa657', pct: 79, type: 'Public', cost4yr: 119609, desc: 'Austin, TX · ~50,000 students', details: ['Auto-admit: Top 10% TX', 'Apply by Nov 1, 2027', 'Business/CS/Engineering', 'Longhorn Scholars available'] },
+    { name: '🦉 Rice University', color: '#a855f7', pct: 40, type: 'Private', cost4yr: 354591, desc: 'Houston, TX · ~4,000 undergrads', details: ['Highly selective (reach)', 'Apply by Nov 1, 2027', 'Strong engineering/sci', 'Generous merit aid at 1500+ SAT'] },
+    { name: '🐾 Texas A&M', color: '#3fb950', pct: 63, type: 'Public', cost4yr: 108000, desc: 'College Station, TX · ~57,000 students', details: ['Strong STEM/engineering', 'Apply by Dec 1, 2027', 'Mays Business School', 'Honors program available'] },
+    { name: '🐻 Baylor', color: '#58a6ff', pct: 70, type: 'Private', cost4yr: 225000, desc: 'Waco, TX · ~17,000 undergrads', details: ['Christian university', 'Apply by Nov 1, 2027', 'Pre-med/business strong', 'Merit aid: up to $20K/yr'] },
+];
+
+const nationalSchools = [
+    { name: '🌊 UT Dallas', color: '#3fb950', pct: 85, type: 'Public', cost4yr: 95000, desc: 'Richardson, TX · Honors college', details: ['National Merit pathway', 'Full ride for NM Finalists', 'CS ranked top 30', 'Strong tech industry connections'] },
+    { name: '⚡ Tulane', color: '#ffa657', pct: 15, type: 'Private', cost4yr: 320000, desc: 'New Orleans, LA · Stretch school', details: ['Generous merit aid', '1400+ SAT competitive', 'Strong business/pre-med', 'Vibrant city campus'] },
+];
+
+function renderSchools(schools) {
+    const content = document.getElementById('schoolContent');
+    content.innerHTML = '';
+    schools.forEach(s => {
+        content.innerHTML += `
+        <div class="school-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <h5 class="mb-1" style="color:${s.color}">${s.name}</h5>
+                    <div class="timestamp">${s.desc} · ${s.type}</div>
+                </div>
+                <div class="admit-pct" style="color:${s.pct > 60 ? '#3fb950' : s.pct > 40 ? '#ffa657' : '#f85149'}">${s.pct}%</div>
+            </div>
+            <div class="progress mb-3">
+                <div class="progress-bar" style="width:${s.pct}%;background:${s.color}"></div>
+            </div>
+            <div class="row g-1">
+                ${s.details.map(d => `<div class="col-6"><div class="timestamp">• ${d}</div></div>`).join('')}
+            </div>
+            <div class="mt-2 timestamp" style="color:${s.color}">💰 4-yr total: $${s.cost4yr.toLocaleString()}</div>
+        </div>`;
+    });
+}
+
+function showSchools(type) {
+    document.getElementById('tabTX').className = type === 'texas' ? 'tab-btn active' : 'tab-btn';
+    document.getElementById('tabNat').className = type === 'national' ? 'tab-btn active' : 'tab-btn';
+    renderSchools(type === 'texas' ? texasSchools : nationalSchools);
+}
+
+let checkedItems = JSON.parse(localStorage.getItem('collegeChecklist') || '{}');
+
+function toggleCheck(id) {
+    checkedItems[id] = !checkedItems[id];
+    localStorage.setItem('collegeChecklist', JSON.stringify(checkedItems));
+    const item = document.getElementById(id);
+    const cb = item.querySelector('input');
+    cb.checked = checkedItems[id];
+    item.classList.toggle('done', checkedItems[id]);
+    updateChecklistProgress();
+}
+
+function updateChecklistProgress() {
+    const total = 10;
+    const done = Object.values(checkedItems).filter(Boolean).length;
+    document.getElementById('checklistProgress').style.width = (done/total*100) + '%';
+    document.getElementById('checklistPct').textContent = `${done}/10`;
+    // Apply saved states
+    for (let i = 1; i <= 10; i++) {
+        const item = document.getElementById(`chk${i}`);
+        if (item && checkedItems[`chk${i}`]) {
+            item.querySelector('input').checked = true;
+            item.classList.add('done');
+        }
+    }
+}
+
+function buildCostChart() {
+    const ctx = document.getElementById('costChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Tuition (4yr)', 'Room/Board (4yr)', 'Books/Fees', '4-Year TOTAL'],
+            datasets: [
+                { label: 'UT Austin', data: [57200, 48400, 14009, 119609], backgroundColor: 'rgba(255,166,87,0.8)' },
+                { label: 'Rice University', data: [222800, 97600, 34191, 354591], backgroundColor: 'rgba(168,85,247,0.8)' },
+                { label: 'Texas A&M', data: [50000, 44000, 14000, 108000], backgroundColor: 'rgba(63,185,80,0.8)' },
+                { label: 'Rice (after merit aid)', data: [162800, 97600, 34191, 194591], backgroundColor: 'rgba(88,166,255,0.8)' },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: '#e6edf3', font: { size: 11 } } },
+                tooltip: { callbacks: { label: ctx => `$${ctx.parsed.y.toLocaleString()}` } }
+            },
+            scales: {
+                y: { ticks: { color: '#8b949e', callback: v => `$${(v/1000).toFixed(0)}K` }, grid: { color: '#30363d' } },
+                x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+            }
+        }
+    });
+}
+
+// Calculate days to May 1, 2028
+const decisionDay = new Date('2028-05-01');
+const today = new Date('2026-02-20');
+const daysLeft = Math.round((decisionDay - today) / (1000*60*60*24));
+document.getElementById('daysToDecision').textContent = daysLeft.toLocaleString();
+
+// Init
+showSchools('texas');
+updateChecklistProgress();
+buildCostChart();
+</script>
+</body>
+</html>

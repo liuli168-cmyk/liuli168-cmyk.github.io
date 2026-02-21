@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weight Progress Dashboard v2 — Lilly</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; margin-bottom: 20px; }
+        .card-header { background: #1f2937; border-bottom: 1px solid #30363d; border-radius: 12px 12px 0 0; padding: 14px 20px; }
+        .card-body { padding: 20px; }
+        h1 { color: #ff7eb6; }
+        .lead { color: #8b949e; }
+        .metric-box { background: #1f2937; border-radius: 10px; padding: 20px; text-align: center; border: 1px solid #30363d; height: 100%; }
+        .metric-value { font-size: 2.2rem; font-weight: 700; }
+        .metric-label { color: #8b949e; font-size: 0.8rem; margin-top: 4px; }
+        .progress { height: 28px; background: #30363d; border-radius: 14px; }
+        .progress-bar-custom { background: linear-gradient(90deg, #ff7eb6, #a855f7); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; }
+        .milestone { background: #1f2937; border-radius: 10px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #30363d; }
+        .milestone.completed { border-left-color: #3fb950; opacity: 0.8; }
+        .milestone.next { border-left-color: #ffa657; background: #1a2d0d; }
+        .milestone.upcoming { border-left-color: #58a6ff; }
+        .milestone.goal { border-left-color: #ff7eb6; background: #2d0d1a; }
+        .chart-container { height: 280px; }
+        .form-control, .form-select { background: #0d1117; border: 1px solid #30363d; color: #e6edf3; }
+        .form-control:focus, .form-select:focus { background: #0d1117; border-color: #ff7eb6; color: #e6edf3; box-shadow: 0 0 0 0.25rem rgba(255,126,182,0.25); }
+        .form-label { color: #8b949e; }
+        .btn-pink { background: #a855f7; border: none; color: white; border-radius: 8px; padding: 10px 20px; cursor: pointer; }
+        .btn-pink:hover { background: #9333ea; }
+        .btn-outline-pink { background: transparent; border: 1px solid #ff7eb6; color: #ff7eb6; border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+        .btn-outline-pink:hover { background: rgba(255,126,182,0.1); }
+        .timestamp { color: #8b949e; font-size: 0.75rem; }
+        .bmi-zone { padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 6px; }
+        .water-btn { width: 44px; height: 44px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; border: 2px solid #30363d; background: #1f2937; transition: all 0.15s; }
+        .water-btn.filled { background: #1a3a4a; border-color: #58a6ff; }
+        .macro-bar { height: 10px; border-radius: 5px; margin-bottom: 4px; }
+        .quote-box { background: linear-gradient(135deg, #1a0d2e, #0d1a2e); border: 1px solid #a855f7; border-radius: 10px; padding: 16px; font-style: italic; }
+        .new-badge { background: #1a3a1a; border: 1px solid #3fb950; color: #3fb950; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; }
+        input[type=range] { accent-color: #ff7eb6; width: 100%; }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h1 class="mb-1">🌸 Weight Progress Dashboard <span style="font-size:0.5em;color:#8b949e">v2</span></h1>
+            <p class="lead mb-0">Lilly's journey: 160.8 lbs → 130.0 lbs · You've got this! 💪</p>
+            <div class="timestamp mt-1">Night Shift Refresh: Feb 20, 2026 — 10:15 PM CST · 10 days since start · Current: 159.0 lbs · Lost: 1.8 lbs · 130 lbs goal · July 5, 2026 target · Log Feb 21 weigh-in to continue your streak! 🔥</div>
+        </div>
+    </div>
+
+    <!-- Motivational Quote -->
+    <div class="quote-box mb-3">
+        <div style="color:#a855f7;font-size:1.1rem;margin-bottom:6px" id="dailyQuote">"The secret of getting ahead is getting started." — Mark Twain</div>
+        <div class="timestamp">Daily inspiration · <span id="quoteDate">Feb 20, 2026</span></div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="card">
+        <div class="card-body py-3">
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#ff7eb6" id="startWeightDisp">160.8</div>
+                        <div class="metric-label">Start Weight (lbs)</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#ffa657" id="currentWeightDisp">160.8</div>
+                        <div class="metric-label">Current Weight (lbs)</div>
+                        <div class="timestamp mt-1" id="lastLogDate">Log below to update</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#3fb950">130.0</div>
+                        <div class="metric-label">Goal Weight (lbs)</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#58a6ff" id="lbsToGoDisp">30.8</div>
+                        <div class="metric-label">Lbs to Goal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h6 class="mb-0">📊 Progress to Goal</h6>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">160.8 lbs (start)</span>
+                <span id="progressPct" style="color:#ff7eb6; font-weight:700">0% complete</span>
+                <span class="text-muted">130.0 lbs (goal)</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar-custom" id="progressBar" style="width: 1%">0%</div>
+            </div>
+            <div class="d-flex justify-content-between mt-2">
+                <span class="timestamp">🎯 Next milestone: 155 lbs (est. March 12)</span>
+                <span class="timestamp">⏰ 135 days remaining to July 5</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column: Tracker + Milestones -->
+        <div class="col-md-5">
+            <!-- BMI Tracker NEW -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h6 class="mb-0">📏 BMI Tracker <span class="new-badge ms-2">NEW</span></h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Height (inches): <span id="heightInches">64</span>" (5'4")</label>
+                        <input type="range" id="heightSlider" min="58" max="72" value="64" oninput="updateBMI()">
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4 text-center" style="background:#1f2937;border-radius:8px;padding:12px">
+                            <div style="color:#f85149;font-weight:700;font-size:1.3rem" id="bmiStart">27.6</div>
+                            <div class="timestamp">BMI at Start<br>160.8 lbs</div>
+                        </div>
+                        <div class="col-4 text-center" style="background:#1f2937;border-radius:8px;padding:12px">
+                            <div style="color:#ffa657;font-weight:700;font-size:1.3rem" id="bmiCurrent">27.6</div>
+                            <div class="timestamp">BMI Current</div>
+                        </div>
+                        <div class="col-4 text-center" style="background:#1f2937;border-radius:8px;padding:12px">
+                            <div style="color:#3fb950;font-weight:700;font-size:1.3rem" id="bmiGoal">22.3</div>
+                            <div class="timestamp">BMI at Goal<br>130 lbs</div>
+                        </div>
+                    </div>
+                    <div class="bmi-zone" style="background:#0d2818;border:1px solid #3fb950">
+                        <strong style="color:#3fb950">✅ Goal BMI: 22.3</strong> — Healthy Range (18.5–24.9)
+                    </div>
+                    <div class="bmi-zone" style="background:#2d1f0d;border:1px solid #ffa657" id="bmiCurrentZone">
+                        <strong style="color:#ffa657">⚠️ Current BMI: 27.6</strong> — Overweight Range (25–29.9)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Log -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">📝 Log Today's Weight</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Today's weight (lbs)</label>
+                        <input type="number" class="form-control" id="todayWeight" placeholder="Enter weight..." step="0.1" min="100" max="200">
+                    </div>
+                    <button class="btn-pink w-100" onclick="logWeight()">✅ Log Weight</button>
+                    <div id="logResult" class="mt-3"></div>
+                    <hr style="border-color:#30363d">
+                    <!-- Water Intake NEW -->
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="color:#8b949e;font-size:0.85rem">💧 Water intake today</span>
+                            <span style="color:#58a6ff;font-size:0.85rem" id="waterCount">0 / 8 glasses</span>
+                        </div>
+                        <div id="waterGrid" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+                    </div>
+                    <hr style="border-color:#30363d">
+                    <div class="timestamp">
+                        <strong>Daily targets at 1.5 lbs/week pace:</strong><br>
+                        🔥 Calories: 1,200–1,350/day (750 cal deficit from ~2,000 TDEE)<br>
+                        💧 Water: 8+ glasses daily (essential for fat loss)<br>
+                        🚶 Steps: 8,000–10,000/day<br>
+                        💪 Protein: 100–120g/day (preserve muscle)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Milestones -->
+            <div class="card">
+                <div class="card-header"><h6 class="mb-0">🏆 Milestones</h6></div>
+                <div class="card-body">
+                    <div class="milestone next">
+                        <div class="d-flex justify-content-between">
+                            <div><div class="fw-bold">🎯 155 lbs</div><div class="timestamp">5.8 lbs to go · Est. March 12</div></div>
+                            <div class="text-end"><div style="color:#ffa657;font-weight:700">NEXT UP</div><div class="timestamp">~3.9 weeks</div></div>
+                        </div>
+                    </div>
+                    <div class="milestone upcoming">
+                        <div class="d-flex justify-content-between">
+                            <div><div class="fw-bold">⚡ 150 lbs — "One-Five-Oh!"</div><div class="timestamp">10.8 lbs to go · Est. April 4</div></div>
+                            <div class="text-end"><div style="color:#58a6ff;font-weight:700">UPCOMING</div></div>
+                        </div>
+                    </div>
+                    <div class="milestone upcoming">
+                        <div class="d-flex justify-content-between">
+                            <div><div class="fw-bold">💪 145 lbs — Halfway there!</div><div class="timestamp">15.8 lbs to go · Est. May 1</div></div>
+                            <div class="text-end"><div style="color:#58a6ff;font-weight:700">UPCOMING</div></div>
+                        </div>
+                    </div>
+                    <div class="milestone upcoming">
+                        <div class="d-flex justify-content-between">
+                            <div><div class="fw-bold">🌟 140 lbs — Almost there!</div><div class="timestamp">20.8 lbs to go · Est. May 30</div></div>
+                            <div class="text-end"><div style="color:#58a6ff;font-weight:700">UPCOMING</div></div>
+                        </div>
+                    </div>
+                    <div class="milestone goal">
+                        <div class="d-flex justify-content-between">
+                            <div><div class="fw-bold">🎊 130 lbs — GOAL REACHED!</div><div class="timestamp">30.8 lbs total · July 5, 2026</div></div>
+                            <div class="text-end"><div style="color:#ff7eb6;font-weight:700">GOAL</div><div class="timestamp">135 days</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Charts + Nutrition -->
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header"><h6 class="mb-0">📈 Weight Loss Trajectory</h6></div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="weightChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Macro Planner NEW -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h6 class="mb-0">🥗 Daily Macro Targets <span class="new-badge ms-2">NEW</span></h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-4 text-center">
+                            <div style="background:#1a2d0d;border-radius:8px;padding:14px;border:1px solid #3fb950">
+                                <div style="color:#3fb950;font-weight:700;font-size:1.6rem">110g</div>
+                                <div class="timestamp">Protein 🥩</div>
+                                <div class="timestamp">440 calories · 33%</div>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div style="background:#1a1a0d;border-radius:8px;padding:14px;border:1px solid #ffa657">
+                                <div style="color:#ffa657;font-weight:700;font-size:1.6rem">140g</div>
+                                <div class="timestamp">Carbs 🍚</div>
+                                <div class="timestamp">560 calories · 42%</div>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div style="background:#1a0d2e;border-radius:8px;padding:14px;border:1px solid #a855f7">
+                                <div style="color:#a855f7;font-weight:700;font-size:1.6rem">33g</div>
+                                <div class="timestamp">Fat 🥑</div>
+                                <div class="timestamp">300 calories · 22%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background:#1f2937;border-radius:8px;padding:12px">
+                        <div class="d-flex justify-content-between mb-1"><span class="timestamp">Protein</span><span class="timestamp">110g · 440 cal</span></div>
+                        <div class="macro-bar" style="background:#1a2d0d"><div class="macro-bar" style="width:33%;background:#3fb950"></div></div>
+                        <div class="d-flex justify-content-between mb-1"><span class="timestamp">Carbs</span><span class="timestamp">140g · 560 cal</span></div>
+                        <div class="macro-bar" style="background:#1a1a0d"><div class="macro-bar" style="width:42%;background:#ffa657"></div></div>
+                        <div class="d-flex justify-content-between mb-1"><span class="timestamp">Fat</span><span class="timestamp">33g · 297 cal</span></div>
+                        <div class="macro-bar" style="background:#1a0d2e"><div class="macro-bar" style="width:22%;background:#a855f7"></div></div>
+                        <div class="d-flex justify-content-between mt-2 pt-2" style="border-top:1px solid #30363d">
+                            <span style="color:#e6edf3;font-weight:700">Total Daily Target</span>
+                            <span style="color:#ff7eb6;font-weight:700">~1,300 calories</span>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6 style="color:#ff7eb6;font-size:0.85rem">💡 Meal Ideas (1,300 cal/day)</h6>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <div style="background:#1f2937;border-radius:8px;padding:10px;font-size:0.8rem">
+                                    <div style="color:#ffa657;font-weight:700">Breakfast ~350 cal</div>
+                                    Greek yogurt (0%) + berries + 2 eggs scrambled
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div style="background:#1f2937;border-radius:8px;padding:10px;font-size:0.8rem">
+                                    <div style="color:#3fb950;font-weight:700">Lunch ~450 cal</div>
+                                    Grilled chicken salad + quinoa + olive oil dressing
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div style="background:#1f2937;border-radius:8px;padding:10px;font-size:0.8rem">
+                                    <div style="color:#58a6ff;font-weight:700">Dinner ~500 cal</div>
+                                    Salmon 6oz + roasted veggies + small sweet potato
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Schedule NEW -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h6 class="mb-0">🏃 Weekly Workout Plan <span class="new-badge ms-2">NEW</span></h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0" style="color:#e6edf3">
+                            <thead style="background:#1f2937">
+                                <tr><th style="border-color:#30363d">Day</th><th style="border-color:#30363d">Workout</th><th style="border-color:#30363d">Duration</th><th style="border-color:#30363d">Cal Burn</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-color:#30363d;background:#1a2d0d"><td><strong style="color:#3fb950">Mon</strong></td><td>🏃 Cardio (brisk walk/jog)</td><td>45 min</td><td>~300</td></tr>
+                                <tr style="border-color:#30363d"><td><strong style="color:#58a6ff">Tue</strong></td><td>💪 Strength training (full body)</td><td>45 min</td><td>~250</td></tr>
+                                <tr style="border-color:#30363d;background:#1a2d0d"><td><strong style="color:#3fb950">Wed</strong></td><td>🧘 Yoga / active recovery</td><td>30 min</td><td>~150</td></tr>
+                                <tr style="border-color:#30363d"><td><strong style="color:#58a6ff">Thu</strong></td><td>🏃 Cardio HIIT</td><td>30 min</td><td>~350</td></tr>
+                                <tr style="border-color:#30363d;background:#1a2d0d"><td><strong style="color:#3fb950">Fri</strong></td><td>💪 Strength training (lower)</td><td>45 min</td><td>~250</td></tr>
+                                <tr style="border-color:#30363d"><td><strong style="color:#ffa657">Sat</strong></td><td>🚴 Long walk / bike / activity</td><td>60 min</td><td>~400</td></tr>
+                                <tr style="border-color:#30363d;background:#2d0d1a"><td><strong style="color:#ff7eb6">Sun</strong></td><td>😴 Rest — you earned it!</td><td>—</td><td>—</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center timestamp py-2">Built by Huang Rong Night Shift · Refreshed Feb 20, 2026 — 2:00 AM CST · v2.0 · You are amazing, Lilly! 🌸</div>
+</div>
+
+<script>
+const startWeight = 160.8;
+const goalWeight = 130.0;
+const totalLoss = startWeight - goalWeight;
+const startDate = new Date('2026-01-02');
+const goalDate = new Date('2026-07-05');
+const totalDays = (goalDate - startDate) / (1000*60*60*24);
+const lbsPerDay = totalLoss / totalDays;
+const today = new Date('2026-02-20');
+const daysElapsed = (today - startDate) / (1000*60*60*24);
+
+let weightLog = JSON.parse(localStorage.getItem('weightLogV2') || '[]');
+let waterGlasses = parseInt(localStorage.getItem('waterToday') || '0');
+let currentWeight = weightLog.length > 0 ? weightLog[weightLog.length-1].weight : startWeight;
+
+const quotes = [
+    '"The secret of getting ahead is getting started." — Mark Twain',
+    '"Take care of your body. It\'s the only place you have to live." — Jim Rohn',
+    '"Small steps in the right direction can turn out to be the biggest step of your life." — Unknown',
+    '"Your body can stand almost anything. It\'s your mind that you have to convince." — Unknown',
+    '"Progress, not perfection." — Unknown',
+    '"You didn\'t come this far to only come this far." — Unknown',
+    '"Every workout is progress." — Unknown',
+];
+document.getElementById('dailyQuote').textContent = '"' + quotes[new Date().getDate() % quotes.length];
+
+function calcBMI(weight, heightIn) {
+    return ((weight / (heightIn * heightIn)) * 703).toFixed(1);
+}
+
+function updateBMI() {
+    const h = parseInt(document.getElementById('heightSlider').value);
+    document.getElementById('heightInches').textContent = h;
+    document.getElementById('bmiStart').textContent = calcBMI(startWeight, h);
+    document.getElementById('bmiCurrent').textContent = calcBMI(currentWeight, h);
+    document.getElementById('bmiGoal').textContent = calcBMI(goalWeight, h);
+    const bmiCur = parseFloat(calcBMI(currentWeight, h));
+    const zone = document.getElementById('bmiCurrentZone');
+    if (bmiCur < 18.5) { zone.style.borderColor = '#58a6ff'; zone.innerHTML = `<strong style="color:#58a6ff">ℹ️ Current BMI: ${bmiCur}</strong> — Underweight`; }
+    else if (bmiCur <= 24.9) { zone.style.borderColor = '#3fb950'; zone.innerHTML = `<strong style="color:#3fb950">✅ Current BMI: ${bmiCur}</strong> — Healthy Range`; }
+    else if (bmiCur <= 29.9) { zone.style.borderColor = '#ffa657'; zone.innerHTML = `<strong style="color:#ffa657">⚠️ Current BMI: ${bmiCur}</strong> — Overweight Range`; }
+    else { zone.style.borderColor = '#f85149'; zone.innerHTML = `<strong style="color:#f85149">⚠️ Current BMI: ${bmiCur}</strong> — Obese Range`; }
+}
+
+function updateMetrics(cw) {
+    const lost = startWeight - cw;
+    const toGo = cw - goalWeight;
+    const pct = Math.max(0, Math.min(100, (lost / totalLoss) * 100));
+    document.getElementById('currentWeightDisp').textContent = cw.toFixed(1);
+    document.getElementById('lbsToGoDisp').textContent = Math.max(0, toGo).toFixed(1);
+    document.getElementById('progressBar').style.width = Math.max(1, pct) + '%';
+    document.getElementById('progressBar').textContent = pct.toFixed(1) + '%';
+    document.getElementById('progressPct').textContent = pct.toFixed(1) + '% complete';
+    updateBMI();
+}
+
+function buildWaterGrid() {
+    const grid = document.getElementById('waterGrid');
+    grid.innerHTML = '';
+    for (let i = 0; i < 8; i++) {
+        const btn = document.createElement('div');
+        btn.className = 'water-btn' + (i < waterGlasses ? ' filled' : '');
+        btn.textContent = '💧';
+        btn.title = i < waterGlasses ? 'Click to remove' : 'Click to add';
+        btn.onclick = () => { waterGlasses = i < waterGlasses ? i : i + 1; localStorage.setItem('waterToday', waterGlasses); buildWaterGrid(); };
+        grid.appendChild(btn);
+    }
+    document.getElementById('waterCount').textContent = `${waterGlasses} / 8 glasses`;
+}
+
+function logWeight() {
+    const val = parseFloat(document.getElementById('todayWeight').value);
+    if (isNaN(val) || val < 100 || val > 200) {
+        document.getElementById('logResult').innerHTML = '<div style="color:#f85149">Please enter a valid weight (100–200 lbs)</div>';
+        return;
+    }
+    const entry = { date: today.toLocaleDateString('en-US', {month:'short',day:'numeric'}), weight: val };
+    weightLog.push(entry);
+    localStorage.setItem('weightLogV2', JSON.stringify(weightLog));
+    currentWeight = val;
+    const lost = startWeight - val;
+    const pace = daysElapsed > 0 ? (lost / daysElapsed * 7).toFixed(2) : '—';
+    document.getElementById('lastLogDate').textContent = `Updated ${entry.date}`;
+    document.getElementById('logResult').innerHTML = `
+        <div style="background:#0d2818;border-radius:8px;padding:12px;border:1px solid #3fb950">
+            <div style="color:#3fb950;font-weight:700">✅ Logged: ${val} lbs</div>
+            <div style="color:#8b949e;font-size:0.85rem">Lost: ${lost.toFixed(1)} lbs total · Pace: ${pace} lbs/week</div>
+            ${lost > 0 ? `<div style="color:#ff7eb6;font-size:0.85rem;margin-top:4px">🌸 Keep going! ${(goalWeight+totalLoss-val).toFixed(1)} lbs to goal!</div>` : ''}
+        </div>`;
+    updateMetrics(val);
+    buildWeightChart();
+}
+
+function buildWeightChart() {
+    const ctx = document.getElementById('weightChart').getContext('2d');
+    if (window.weightChartInst) window.weightChartInst.destroy();
+    const months = [];
+    const projected = [];
+    const goal = [];
+    for (let d = 0; d <= totalDays; d += 7) {
+        const dt = new Date(startDate);
+        dt.setDate(dt.getDate() + d);
+        months.push(dt.toLocaleDateString('en-US', {month:'short', day:'numeric'}));
+        projected.push(+(startWeight - lbsPerDay * d).toFixed(1));
+        goal.push(goalWeight);
+    }
+    const actualData = Array(Math.round(daysElapsed/7)).fill(null);
+    weightLog.forEach((e, i) => { if (i < actualData.length) actualData[i] = e.weight; });
+    if (weightLog.length === 0) actualData[0] = startWeight;
+
+    window.weightChartInst = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [
+                { label: 'Target Pace', data: projected, borderColor: '#58a6ff', borderDash: [6,3], backgroundColor: 'transparent', pointRadius: 0 },
+                { label: 'Goal Line', data: goal, borderColor: '#3fb950', borderDash: [4,4], backgroundColor: 'transparent', pointRadius: 0 },
+                { label: 'Actual Weight', data: actualData, borderColor: '#ff7eb6', backgroundColor: 'rgba(255,126,182,0.15)', fill: true, tension: 0.4, pointRadius: 5, pointBackgroundColor: '#ff7eb6' }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#e6edf3' } } },
+            scales: {
+                y: { min: 125, max: 165, ticks: { color: '#8b949e', callback: v => v + ' lbs' }, grid: { color: '#30363d' } },
+                x: { ticks: { color: '#8b949e', maxTicksLimit: 8 }, grid: { color: '#30363d' } }
+            }
+        }
+    });
+}
+
+// Init
+updateMetrics(currentWeight);
+buildWaterGrid();
+buildWeightChart();
+</script>
+</body>
+</html>
