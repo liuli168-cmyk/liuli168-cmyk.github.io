@@ -46,7 +46,7 @@
     <div class="row mb-3">
         <div class="col-12">
             <h1 class="mb-1">🌸 Weight Progress Dashboard <span style="font-size:0.5em;color:#8b949e">v2</span></h1>
-            <p class="lead mb-0">Lilly's journey: 160.8 lbs → 130.0 lbs · You've got this! 💪</p>
+            <p class="lead mb-0">Lilly's journey: 159 lbs → 130.0 lbs · You've got this! 💪</p>
             <div class="timestamp mt-1">Night Shift Refresh: Feb 20, 2026 — 10:15 PM CST · 10 days since start · Current: 159.0 lbs · Lost: 1.8 lbs · 130 lbs goal · July 5, 2026 target · Log Feb 21 weigh-in to continue your streak! 🔥</div>
         </div>
     </div>
@@ -63,13 +63,13 @@
             <div class="row g-3">
                 <div class="col-6 col-md-3">
                     <div class="metric-box">
-                        <div class="metric-value" style="color:#ff7eb6" id="startWeightDisp">160.8</div>
+                        <div class="metric-value" style="color:#ff7eb6" id="startWeightDisp">159</div>
                         <div class="metric-label">Start Weight (lbs)</div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="metric-box">
-                        <div class="metric-value" style="color:#ffa657" id="currentWeightDisp">160.8</div>
+                        <div class="metric-value" style="color:#ffa657" id="currentWeightDisp">159</div>
                         <div class="metric-label">Current Weight (lbs)</div>
                         <div class="timestamp mt-1" id="lastLogDate">Log below to update</div>
                     </div>
@@ -97,7 +97,7 @@
         </div>
         <div class="card-body">
             <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted">160.8 lbs (start)</span>
+                <span class="text-muted">159 lbs (start)</span>
                 <span id="progressPct" style="color:#ff7eb6; font-weight:700">0% complete</span>
                 <span class="text-muted">130.0 lbs (goal)</span>
             </div>
@@ -121,28 +121,28 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">Height (inches): <span id="heightInches">64</span>" (5'4")</label>
-                        <input type="range" id="heightSlider" min="58" max="72" value="64" oninput="updateBMI()">
+                        <label class="form-label">Height (inches): <span id="heightInches">64</span>" (5'7")</label>
+                        <input type="range" id="heightSlider" min="58" max="72" value="67" oninput="updateBMI()">
                     </div>
                     <div class="row g-2 mb-3">
                         <div class="col-4 text-center" style="background:#1f2937;border-radius:8px;padding:12px">
-                            <div style="color:#f85149;font-weight:700;font-size:1.3rem" id="bmiStart">27.6</div>
-                            <div class="timestamp">BMI at Start<br>160.8 lbs</div>
+                            <div style="color:#f85149;font-weight:700;font-size:1.3rem" id="bmiStart">24.9</div>
+                            <div class="timestamp">BMI at Start<br>159 lbs</div>
                         </div>
                         <div class="col-4 text-center" style="background:#1f2937;border-radius:8px;padding:12px">
-                            <div style="color:#ffa657;font-weight:700;font-size:1.3rem" id="bmiCurrent">27.6</div>
+                            <div style="color:#ffa657;font-weight:700;font-size:1.3rem" id="bmiCurrent">24.9</div>
                             <div class="timestamp">BMI Current</div>
                         </div>
                         <div class="col-4 text-center" style="background:#1f2937;border-radius:8px;padding:12px">
-                            <div style="color:#3fb950;font-weight:700;font-size:1.3rem" id="bmiGoal">22.3</div>
+                            <div style="color:#3fb950;font-weight:700;font-size:1.3rem" id="bmiGoal">20.4</div>
                             <div class="timestamp">BMI at Goal<br>130 lbs</div>
                         </div>
                     </div>
                     <div class="bmi-zone" style="background:#0d2818;border:1px solid #3fb950">
-                        <strong style="color:#3fb950">✅ Goal BMI: 22.3</strong> — Healthy Range (18.5–24.9)
+                        <strong style="color:#3fb950">✅ Goal BMI: 20.4</strong> — Healthy Range (18.5–24.9)
                     </div>
                     <div class="bmi-zone" style="background:#2d1f0d;border:1px solid #ffa657" id="bmiCurrentZone">
-                        <strong style="color:#ffa657">⚠️ Current BMI: 27.6</strong> — Overweight Range (25–29.9)
+                        <strong style="color:#ffa657">⚠️ Current BMI: 24.9</strong> — Overweight Range (25–29.9)
                     </div>
                 </div>
             </div>
@@ -326,7 +326,7 @@
 </div>
 
 <script>
-const startWeight = 160.8;
+const startWeight = 159;
 const goalWeight = 130.0;
 const totalLoss = startWeight - goalWeight;
 const startDate = new Date('2026-01-02');
