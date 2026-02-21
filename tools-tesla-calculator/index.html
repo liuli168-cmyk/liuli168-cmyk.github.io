@@ -39,7 +39,7 @@
     <div class="row mb-3">
         <div class="col-12">
             <h1 class="mb-1">⚡ Tesla Covered Call Calculator <span style="font-size:0.55em;color:#8b949e">v3</span></h1>
-            <p class="lead mb-0">Lilly's 2,509 TSLA shares — Income optimization engine</p>
+            <p class="lead mb-0">Lilly's 2,523 TSLA shares — Income optimization engine</p>
             <div class="data-timestamp mt-1">📡 Night Shift Refresh: Feb 20, 2026 — 10:15 PM CST · TSLA last confirmed close $411.71 (Feb 19) · ⚠️ Feb 20 close unconfirmed (see news below) · Market reopens Mon Feb 23 · 25 contracts available</div>
         </div>
     </div>
@@ -109,8 +109,8 @@
                 </div>
                 <div class="col-3">
                     <div class="metric-box">
-                        <div class="metric-value" id="positionValue">$1,033,001</div>
-                        <div class="metric-label">Position Value (2,509 shares)</div>
+                        <div class="metric-value" id="positionValue">$1,038,744</div>
+                        <div class="metric-label">Position Value (2,523 shares)</div>
                     </div>
                 </div>
                 <div class="col-3">
@@ -139,7 +139,7 @@
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <div class="d-flex justify-content-between mb-1">
-                        <span class="data-timestamp">2,509 shares (current)</span>
+                        <span class="data-timestamp">2,523 shares (current)</span>
                         <span style="color:#58a6ff;font-weight:700">50.2% to goal</span>
                         <span class="data-timestamp">5,000 shares (2030 goal)</span>
                     </div>
@@ -185,7 +185,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Shares Owned</label>
-                        <input type="number" class="form-control" id="numShares" value="2509" onchange="updateAll()">
+                        <input type="number" class="form-control" id="numShares" value="2523" onchange="updateAll()">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Expiration Focus</label>
@@ -472,7 +472,7 @@ const liveOptionsData = [
 ];
 
 const currentPrice = 411.71;
-const shares = 2509;
+const shares = 2523;
 const contracts = 25;
 
 function calcIncome(bid) { return bid * contracts * 100; }
@@ -566,7 +566,7 @@ function selectStrike(strike, bid) {
 
 function updateAll() {
     const price = parseFloat(document.getElementById('sharePrice').value) || 411.71;
-    const sh = parseInt(document.getElementById('numShares').value) || 2509;
+    const sh = parseInt(document.getElementById('numShares').value) || 2523;
     const posVal = (price * sh).toLocaleString(undefined, {maximumFractionDigits: 0});
     document.getElementById('tslaPrice').textContent = `$${price.toFixed(2)}`;
     document.getElementById('positionValue').textContent = `$${posVal}`;
