@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tesla Covered Call Calculator v3 — Feb 20, 2026 (Night Refresh)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; margin-bottom: 20px; }
+        .card-header { background: #1f2937; border-bottom: 1px solid #30363d; border-radius: 12px 12px 0 0; padding: 14px 20px; }
+        .card-body { padding: 20px; }
+        h1 { color: #58a6ff; }
+        .lead { color: #8b949e; }
+        .form-control, .form-select { background: #0d1117; border: 1px solid #30363d; color: #e6edf3; }
+        .form-control:focus, .form-select:focus { background: #0d1117; border-color: #58a6ff; color: #e6edf3; box-shadow: 0 0 0 0.25rem rgba(88,166,255,0.25); }
+        .form-label { color: #8b949e; font-size: 0.875rem; }
+        .btn-primary { background: #238636; border-color: #238636; }
+        .btn-primary:hover { background: #2ea043; border-color: #2ea043; }
+        .metric-box { background: #1f2937; border-radius: 10px; padding: 20px; text-align: center; border: 1px solid #30363d; }
+        .metric-value { font-size: 2rem; font-weight: 700; color: #3fb950; }
+        .metric-label { color: #8b949e; font-size: 0.8rem; margin-top: 4px; }
+        .strike-row { padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+        .strike-row:hover { border-color: #58a6ff; }
+        .strike-conservative { background: #0d2818; border-left: 4px solid #3fb950; }
+        .strike-moderate { background: #1a2d0d; border-left: 4px solid #ffa657; }
+        .strike-aggressive { background: #2d1f0d; border-left: 4px solid #f85149; }
+        .strike-selected { border: 2px solid #58a6ff !important; }
+        .badge-conservative { background: #3fb950; color: #000; }
+        .badge-moderate { background: #ffa657; color: #000; }
+        .badge-aggressive { background: #f85149; color: #fff; }
+        .live-price { color: #3fb950; font-size: 1.5rem; font-weight: 700; }
+        .data-timestamp { color: #8b949e; font-size: 0.75rem; }
+        .income-highlight { color: #ffa657; font-weight: 700; }
+        .chart-container { height: 280px; }
+        .alert-dark { background: #1f2937; border: 1px solid #30363d; color: #e6edf3; }
+        table { color: #e6edf3; }
+        .table-dark { --bs-table-bg: #161b22; --bs-table-border-color: #30363d; }
+        .table-hover > tbody > tr:hover { background: #1f2937; }
+        .otm-percent { color: #58a6ff; font-size: 0.8rem; }
+        select option { background: #0d1117; color: #e6edf3; }
+        .roll-card { background: #1a1f2e; border: 1px solid #30363d; border-radius: 10px; padding: 16px; margin-bottom: 10px; }
+        .roll-card.best { border-color: #ffa657; }
+        .tax-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #30363d; }
+        .accum-bar { height: 20px; background: #30363d; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        .accum-fill { height: 100%; background: linear-gradient(90deg, #58a6ff, #3fb950); border-radius: 10px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.75rem; font-weight: 700; }
+        .new-badge { background: #1a3a1a; border: 1px solid #3fb950; color: #3fb950; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h1 class="mb-1">⚡ Tesla Covered Call Calculator <span style="font-size:0.55em;color:#8b949e">v3</span></h1>
+            <p class="lead mb-0">Lilly's 2,509 TSLA shares — Income optimization engine</p>
+            <div class="data-timestamp mt-1">📡 Night Shift Refresh: Feb 20, 2026 — 10:15 PM CST · TSLA last confirmed close $411.71 (Feb 19) · ⚠️ Feb 20 close unconfirmed (see news below) · Market reopens Mon Feb 23 · 25 contracts available</div>
+        </div>
+    </div>
+
+    <!-- ⚡ ACTION ALERT — Weekend Hold -->
+    <div class="alert mb-3" style="background:#1a2d0d;border:1px solid #3fb950;border-radius:10px;color:#e6edf3">
+        <div class="d-flex align-items-start gap-3">
+            <div style="font-size:1.8rem">🔔</div>
+            <div>
+                <h6 class="mb-1" style="color:#3fb950">Weekend — Market Reopens Monday Feb 23 at 9:30 AM CST</h6>
+                <div>Feb 20 options <strong>expired today</strong> — position is now clean (no open calls). <strong>Monday morning action:</strong> sell Mar 20 $440 calls at open. Feb 27 weekly also available if you want shorter duration. Check live bid before placing — weekend news may shift premium ±$1–2. <em>See tonight's news summary below before deciding on strike.</em></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📰 Tonight's TSLA News — Feb 20, 2026 -->
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">📰 Tonight's TSLA News — Feb 20, 2026 <span class="new-badge ms-2">NIGHT SHIFT RESEARCH</span></h6>
+        </div>
+        <div class="card-body py-3">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div style="background:#2d1010;border:1px solid #f85149;border-radius:10px;padding:14px">
+                        <div style="color:#f85149;font-weight:700;margin-bottom:6px">⚠️ BEARISH — Legal Loss</div>
+                        <div style="font-size:0.88rem;color:#c9d1d9"><strong>$243M Autopilot Verdict Upheld</strong><br>Judge denied Tesla's bid to overturn jury verdict on fatal crash caused by Autopilot. Potential for more litigation exposure. Short-term negative catalyst.</div>
+                        <div class="data-timestamp mt-2">Source: TechCrunch · Feb 20, 2026</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div style="background:#1a1f2e;border:1px solid #58a6ff;border-radius:10px;padding:14px">
+                        <div style="color:#58a6ff;font-weight:700;margin-bottom:6px">⚙️ MIXED — Price Action</div>
+                        <div style="font-size:0.88rem;color:#c9d1d9"><strong>Cybertruck Cyberbeast Price Cut</strong><br>Price reduced from $114,990 → $99,990. Signals demand softness for premium EV, but could stimulate volume. Watch delivery numbers.</div>
+                        <div class="data-timestamp mt-2">Source: Reuters · Feb 20, 2026</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div style="background:#0d2818;border:1px solid #3fb950;border-radius:10px;padding:14px">
+                        <div style="color:#3fb950;font-weight:700;margin-bottom:6px">✅ BULLISH — Rating Upgrade</div>
+                        <div style="font-size:0.88rem;color:#c9d1d9"><strong>Seeking Alpha: BUY Upgrade</strong><br>Analyst upgrades TSLA to Buy — "Tesla's Renaissance." Focus: robotics + autonomy pivot, not just cars. Long-term thesis intact despite weak Q4 auto sales.</div>
+                        <div class="data-timestamp mt-2">Source: Seeking Alpha · Feb 18, 2026</div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-dark mt-3 mb-0">
+                <h6 style="color:#ffa657">🤔 Huang Rong's Take: What This Means for Monday's Trade</h6>
+                <ul class="mb-0" style="font-size:0.87rem;color:#c9d1d9">
+                    <li>Autopilot verdict = possible <strong>-2% to -4% gap down Monday</strong>. If TSLA opens ~$395–405, reconsider $430 conservative strike instead of $440.</li>
+                    <li>Cybertruck price cut = slightly bearish signal on near-term sentiment, but doesn't change the robotics/FSD story.</li>
+                    <li>Seeking Alpha upgrade = bullish longer-term, but may be priced in already.</li>
+                    <li><strong>Suggested Monday plan:</strong> Wait 15–30 min after open to see initial price action, then sell Mar 20 calls. If TSLA dips below $400, sell $420 or $425 for better buffer + good premium.</li>
+                    <li>IV may spike on Monday open (news = vol) — use limit orders at mid, not market orders.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Price Banner -->
+    <div class="card">
+        <div class="card-body py-3">
+            <div class="row text-center">
+                <div class="col-3">
+                    <div class="metric-box">
+                        <div class="live-price" id="tslaPrice">$411.71</div>
+                        <div class="metric-label">TSLA (Feb 19 close — last confirmed)</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="metric-box">
+                        <div class="metric-value" id="positionValue">$1,033,001</div>
+                        <div class="metric-label">Position Value (2,509 shares)</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#ffa657" id="monthlyIncome">$21,750</div>
+                        <div class="metric-label">Monthly Income (selected strategy)</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="metric-box">
+                        <div class="metric-value" style="color:#58a6ff" id="annualYield">25.3%</div>
+                        <div class="metric-label">Annualized Yield on Position</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Accumulation Progress -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h6 class="mb-0">📈 Share Accumulation Progress</h6>
+            <span class="new-badge">LIVE CALC</span>
+        </div>
+        <div class="card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="data-timestamp">2,509 shares (current)</span>
+                        <span style="color:#58a6ff;font-weight:700">50.2% to goal</span>
+                        <span class="data-timestamp">5,000 shares (2030 goal)</span>
+                    </div>
+                    <div class="accum-bar">
+                        <div class="accum-fill" style="width:50.2%">50.2%</div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <span class="data-timestamp">2,491 shares still needed · ~$1.025M at current price</span>
+                        <span class="data-timestamp">~4.8 years if reinvesting $21,750/mo income</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="row g-2 text-center">
+                        <div class="col-6">
+                            <div style="background:#1f2937;border-radius:8px;padding:12px">
+                                <div style="color:#3fb950;font-weight:700;font-size:1.2rem">$261K</div>
+                                <div class="data-timestamp">Annual income (moderate)</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div style="background:#1f2937;border-radius:8px;padding:12px">
+                                <div style="color:#ffa657;font-weight:700;font-size:1.2rem">634</div>
+                                <div class="data-timestamp">Shares buyable/yr w/ income</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Calculator -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">⚙️ Strategy Parameters</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Current TSLA Price ($)</label>
+                        <input type="number" class="form-control" id="sharePrice" value="411.71" step="0.01" onchange="updateAll()">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Shares Owned</label>
+                        <input type="number" class="form-control" id="numShares" value="2509" onchange="updateAll()">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Expiration Focus</label>
+                        <select class="form-select" id="expStrategy" onchange="updateAll()">
+                            <option value="7dte">Feb 27 — 7 DTE (this week)</option>
+                            <option value="28dte" selected>Mar 20 — 28 DTE (monthly) ⭐</option>
+                            <option value="56dte">Apr 17 — 56 DTE (45-day theta)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">OTM Target</label>
+                        <select class="form-select" id="otmTarget" onchange="updateAll()">
+                            <option value="2pct">2% OTM — Near the money</option>
+                            <option value="5pct" selected>5% OTM — Conservative</option>
+                            <option value="7pct">7% OTM — Moderate</option>
+                            <option value="10pct">10% OTM — Aggressive upside</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary w-100" onclick="updateAll()">🔄 Recalculate</button>
+                </div>
+            </div>
+
+            <!-- Quick Strike Selector -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h6 class="mb-0">🎯 Quick Strike Analysis (Mar 20)</h6>
+                </div>
+                <div class="card-body p-2">
+                    <div class="strike-row strike-conservative" onclick="selectStrike(430, 11.90)">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge badge-conservative rounded-pill">CONSERVATIVE</span>
+                                <div class="fw-bold mt-1">$430 strike</div>
+                                <div class="otm-percent">4.4% OTM • 28 DTE</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="income-highlight">$29,750</div>
+                                <div class="data-timestamp">$11.90 bid × 25 cts</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="strike-row strike-moderate strike-selected" id="selected-440" onclick="selectStrike(440, 8.70)">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge badge-moderate rounded-pill">MODERATE ⭐</span>
+                                <div class="fw-bold mt-1">$440 strike</div>
+                                <div class="otm-percent">6.9% OTM • 28 DTE</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="income-highlight">$21,750</div>
+                                <div class="data-timestamp">$8.70 bid × 25 cts</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="strike-row strike-aggressive" onclick="selectStrike(450, 6.25)">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge badge-aggressive rounded-pill">AGGRESSIVE</span>
+                                <div class="fw-bold mt-1">$450 strike</div>
+                                <div class="otm-percent">9.3% OTM • 28 DTE</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="income-highlight">$15,625</div>
+                                <div class="data-timestamp">$6.25 bid × 25 cts</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">📊 Income vs Strike Price (Mar 20 Expiry)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="incomeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">📈 12-Month Cumulative Income Projection</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="projectionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Options Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">📋 Options Chain Snapshot — TSLA Calls (Feb 19, 2026 close · Feb 20 expired)</h6>
+            <span class="badge bg-warning text-dark">Feb 20 exp CLEARED</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Expiry</th>
+                            <th>Strike</th>
+                            <th>% OTM</th>
+                            <th>Bid</th>
+                            <th>Ask</th>
+                            <th>Income (25 cts)</th>
+                            <th>OI</th>
+                            <th>IV</th>
+                            <th>Annualized Yield</th>
+                        </tr>
+                    </thead>
+                    <tbody id="optionsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Rolling Strategy Section -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h6 class="mb-0">🔄 Rolling Strategy Guide <span class="new-badge ms-2">NEW</span></h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="roll-card best">
+                        <div style="color:#ffa657;font-weight:700;margin-bottom:8px">🔄 Roll Up & Out (Preferred)</div>
+                        <div class="data-timestamp mb-2">When TSLA rallies toward strike price</div>
+                        <ul style="color:#c9d1d9;font-size:0.85rem;padding-left:16px;margin:0">
+                            <li>Buy back $440 Mar 20 call</li>
+                            <li>Sell $450 Apr 17 call</li>
+                            <li>Net credit: ~$3–4 to roll</li>
+                            <li>Capture additional upside &amp; extend</li>
+                        </ul>
+                        <div style="margin-top:10px;background:#0d1117;border-radius:6px;padding:8px;font-size:0.8rem">
+                            Est. cost to buy back if TSLA @$435: ~$11.50<br>
+                            Apr 17 $450 credit: ~$14.05 → <strong style="color:#3fb950">+$2.55 net</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="roll-card">
+                        <div style="color:#58a6ff;font-weight:700;margin-bottom:8px">📉 Let Expire &amp; Resell (Base)</div>
+                        <div class="data-timestamp mb-2">If TSLA stays below $440 at expiry</div>
+                        <ul style="color:#c9d1d9;font-size:0.85rem;padding-left:16px;margin:0">
+                            <li>Mar 20 call expires worthless</li>
+                            <li>Keep full $21,750 premium</li>
+                            <li>Sell Apr 17 call next day</li>
+                            <li>Same or higher strike</li>
+                        </ul>
+                        <div style="margin-top:10px;background:#0d1117;border-radius:6px;padding:8px;font-size:0.8rem">
+                            Best outcome for income strategy<br>
+                            Repeat: <strong style="color:#3fb950">$261,000/yr annualized</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="roll-card">
+                        <div style="color:#f85149;font-weight:700;margin-bottom:8px">⚠️ Assignment Protection</div>
+                        <div class="data-timestamp mb-2">If TSLA spikes above $440</div>
+                        <ul style="color:#c9d1d9;font-size:0.85rem;padding-left:16px;margin:0">
+                            <li>Roll before last 5 DTE to avoid</li>
+                            <li>Buy back when delta &gt; 0.50</li>
+                            <li>Accept assignment = profit locked in</li>
+                            <li>Rebuild position via cash-secured puts</li>
+                        </ul>
+                        <div style="margin-top:10px;background:#0d1117;border-radius:6px;padding:8px;font-size:0.8rem">
+                            If assigned at $440: receives $440×2500 = <strong style="color:#ffa657">$1.1M cash</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Tax Estimation -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h6 class="mb-0">🧾 Tax Estimate — Covered Call Income <span class="new-badge ms-2">NEW</span></h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="tax-row"><span style="color:#8b949e">Annual covered call income (moderate)</span><span style="color:#ffa657;font-weight:700">$261,000</span></div>
+                    <div class="tax-row"><span style="color:#8b949e">Federal tax rate (top bracket est.)</span><span>37%</span></div>
+                    <div class="tax-row"><span style="color:#8b949e">Short-term cap gains (options expire &lt;1yr)</span><span>37%</span></div>
+                    <div class="tax-row"><span style="color:#8b949e">Texas state income tax</span><span style="color:#3fb950">0% (No state tax!)</span></div>
+                    <div class="tax-row"><span style="color:#8b949e">Net Medicare surcharge (3.8% NII)</span><span>3.8%</span></div>
+                    <div class="tax-row" style="border:none"><span style="color:#e6edf3;font-weight:700">Est. after-tax annual income</span><span style="color:#3fb950;font-weight:700;font-size:1.1rem">~$154,000</span></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-dark mb-0">
+                        <h6 style="color:#58a6ff">💡 Tax Optimization Tips</h6>
+                        <ul class="mb-0" style="font-size:0.85rem;color:#c9d1d9">
+                            <li>Options held &gt;1 year = long-term rates (20%) — not typical for covered calls</li>
+                            <li>Max-pain: sell covered calls in tax-advantaged accounts if available</li>
+                            <li>Harvest losses in Dec to offset option gains</li>
+                            <li>Qualified covered writes can defer gain recognition — consult CPA</li>
+                            <li><strong style="color:#ffa657">Keep $65K in reserve each quarter for estimated taxes</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strategy Summary -->
+    <div class="card">
+        <div class="card-header">
+            <h6 class="mb-0">💡 Monday's Recommendation — Huang Rong Analysis (Updated Fri 10 PM)</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="alert alert-dark">
+                        <h6 class="text-warning">🎯 Primary: Wait 15 Min, Then Sell Mar 20 Calls</h6>
+                        <ul class="mb-0">
+                            <li>Feb 20 exp <strong>expired today</strong> — position now clean ✅</li>
+                            <li>Wait for Monday open price action (Autopilot news may gap down)</li>
+                            <li>If TSLA opens <strong>≥$407</strong>: sell $440 strike (~$8.70 × 25 = <strong class="text-warning">$21,750</strong>)</li>
+                            <li>If TSLA opens <strong>$395–$406</strong>: sell $425 strike (more buffer)</li>
+                            <li>Use limit orders at mid — IV spike likely at open</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-dark">
+                        <h6 class="text-info">📅 Alt: Feb 27 Weekly if TSLA Drops Hard</h6>
+                        <ul class="mb-0">
+                            <li>If TSLA gaps down >5%: sell Feb 27 weekly instead</li>
+                            <li>Collect short-term premium while stock recovers</li>
+                            <li>$410 strike (if TSLA ~$385): ~$3.50 bid × 25 = <strong>$8,750</strong></li>
+                            <li>Roll next week at higher strike if stock bounces</li>
+                            <li>Keeps flexibility without capping big potential bounce</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-dark mt-0">
+                <h6 class="text-success">🏦 All Income Scenarios (March 20 Expiry)</h6>
+                <div class="row">
+                    <div class="col-3 text-center"><div class="metric-value" style="font-size:1.4rem">$29,750</div><div class="metric-label">$430 Conservative (4.4% OTM)</div></div>
+                    <div class="col-3 text-center"><div class="metric-value" style="font-size:1.4rem;color:#ffa657">$21,750</div><div class="metric-label">$440 Moderate ⭐ (6.9% OTM)</div></div>
+                    <div class="col-3 text-center"><div class="metric-value" style="font-size:1.4rem">$15,625</div><div class="metric-label">$450 Aggressive (9.3% OTM)</div></div>
+                    <div class="col-3 text-center"><div class="metric-value" style="font-size:1.4rem">$11,000</div><div class="metric-label">$460 Max buffer (11.7% OTM)</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center data-timestamp py-2">Built by Huang Rong Night Shift · v2 built Feb 14 · v3 refresh Feb 20, 2026 — 10:15 PM CST · Next market open: Mon Feb 23 9:30 AM CST · News alert: $243M Autopilot verdict upheld — check Monday open before placing</div>
+</div>
+
+<script>
+// Options data — Feb 20 expired cleared, Feb 27 through Apr 17 active
+const liveOptionsData = [
+    // Feb 27 (7 DTE from Feb 20)
+    { exp: '2026-02-27', dte: 7, strike: 420, bid: 6.20, ask: 6.30, vol: 9403, oi: 2731, iv: 0.403 },
+    { exp: '2026-02-27', dte: 7, strike: 425, bid: 4.45, ask: 4.55, vol: 4343, oi: 7260, iv: 0.396 },
+    { exp: '2026-02-27', dte: 7, strike: 430, bid: 3.15, ask: 3.25, vol: 4067, oi: 4449, iv: 0.394 },
+    { exp: '2026-02-27', dte: 7, strike: 435, bid: 2.18, ask: 2.22, vol: 5460, oi: 11988, iv: 0.390 },
+    { exp: '2026-02-27', dte: 7, strike: 440, bid: 1.79, ask: 1.83, vol: 5065, oi: 2516, iv: 0.389 },
+    // March 20 (28 DTE) — PRIMARY
+    { exp: '2026-03-20', dte: 28, strike: 430, bid: 11.90, ask: 12.00, vol: 1741, oi: 7113, iv: 0.419 },
+    { exp: '2026-03-20', dte: 28, strike: 435, bid: 10.20, ask: 10.30, vol: 556, oi: 2821, iv: 0.416 },
+    { exp: '2026-03-20', dte: 28, strike: 440, bid: 8.70, ask: 8.80, vol: 1103, oi: 19049, iv: 0.414 },
+    { exp: '2026-03-20', dte: 28, strike: 445, bid: 7.40, ask: 7.50, vol: 212, oi: 3000, iv: 0.413 },
+    { exp: '2026-03-20', dte: 28, strike: 450, bid: 6.25, ask: 6.35, vol: 4322, oi: 12355, iv: 0.411 },
+    { exp: '2026-03-20', dte: 28, strike: 455, bid: 5.25, ask: 5.35, vol: 468, oi: 14388, iv: 0.410 },
+    { exp: '2026-03-20', dte: 28, strike: 460, bid: 4.40, ask: 4.50, vol: 1088, oi: 11171, iv: 0.409 },
+    // April 17 (56 DTE)
+    { exp: '2026-04-17', dte: 56, strike: 430, bid: 20.85, ask: 21.00, vol: 263, oi: 2860, iv: 0.441 },
+    { exp: '2026-04-17', dte: 56, strike: 440, bid: 17.15, ask: 17.25, vol: 548, oi: 4293, iv: 0.436 },
+    { exp: '2026-04-17', dte: 56, strike: 450, bid: 14.05, ask: 14.15, vol: 820, oi: 4871, iv: 0.434 },
+    { exp: '2026-04-17', dte: 56, strike: 460, bid: 11.40, ask: 11.50, vol: 318, oi: 3896, iv: 0.431 },
+];
+
+const currentPrice = 411.71;
+const shares = 2509;
+const contracts = 25;
+
+function calcIncome(bid) { return bid * contracts * 100; }
+function calcYield(bid, dte) { return ((bid * contracts * 100) / (currentPrice * shares)) * (365/dte) * 100; }
+function calcOTM(strike) { return ((strike - currentPrice) / currentPrice * 100).toFixed(1); }
+
+function populateTable() {
+    const tbody = document.getElementById('optionsTable');
+    tbody.innerHTML = '';
+    liveOptionsData.forEach(opt => {
+        const income = calcIncome(opt.bid);
+        const yld = calcYield(opt.bid, opt.dte);
+        const otm = calcOTM(opt.strike);
+        const isHighlight = (opt.exp === '2026-03-20' && opt.strike === 440);
+        tbody.innerHTML += `<tr style="${isHighlight ? 'background:#1a2d0d;border-left:3px solid #ffa657' : ''}">
+            <td>${opt.exp}</td>
+            <td>$${opt.strike}</td>
+            <td class="otm-percent">${otm}%</td>
+            <td>$${opt.bid.toFixed(2)}</td>
+            <td>$${opt.ask.toFixed(2)}</td>
+            <td class="income-highlight">$${income.toLocaleString()}</td>
+            <td>${opt.oi.toLocaleString()}</td>
+            <td>${(opt.iv*100).toFixed(1)}%</td>
+            <td style="color:#3fb950">${yld.toFixed(1)}%</td>
+        </tr>`;
+    });
+}
+
+function buildIncomeChart() {
+    const mar20 = liveOptionsData.filter(d => d.exp === '2026-03-20');
+    const ctx = document.getElementById('incomeChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: mar20.map(d => `$${d.strike} (${calcOTM(d.strike)}% OTM)`),
+            datasets: [{
+                label: 'Monthly Income (25 contracts)',
+                data: mar20.map(d => calcIncome(d.bid)),
+                backgroundColor: mar20.map(d => d.strike === 440 ? '#ffa657' : '#238636'),
+                borderColor: mar20.map(d => d.strike === 440 ? '#ff8c00' : '#2ea043'),
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#e6edf3' } },
+                tooltip: { callbacks: { label: ctx => `$${ctx.parsed.y.toLocaleString()}` } } },
+            scales: {
+                y: { ticks: { color: '#8b949e', callback: v => `$${(v/1000).toFixed(0)}K` }, grid: { color: '#30363d' } },
+                x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+            }
+        }
+    });
+}
+
+function buildProjectionChart() {
+    const months = ['Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan'];
+    const conservative = months.map((m,i) => 29750 * (i+1));
+    const moderate = months.map((m,i) => 21750 * (i+1));
+    const aggressive = months.map((m,i) => 15625 * (i+1));
+    const ctx = document.getElementById('projectionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [
+                { label: '$430 Conservative', data: conservative, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.1)', fill: true },
+                { label: '$440 Moderate ⭐', data: moderate, borderColor: '#ffa657', backgroundColor: 'rgba(255,166,87,0.1)', fill: true, borderWidth: 3 },
+                { label: '$450 Aggressive', data: aggressive, borderColor: '#f85149', backgroundColor: 'rgba(248,81,73,0.1)', fill: true },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#e6edf3' } },
+                tooltip: { callbacks: { label: ctx => `$${(ctx.parsed.y/1000).toFixed(0)}K cumulative` } } },
+            scales: {
+                y: { ticks: { color: '#8b949e', callback: v => `$${(v/1000).toFixed(0)}K` }, grid: { color: '#30363d' } },
+                x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+            }
+        }
+    });
+}
+
+function selectStrike(strike, bid) {
+    document.querySelectorAll('.strike-row').forEach(r => r.classList.remove('strike-selected'));
+    const income = calcIncome(bid);
+    const yld = (income / (currentPrice * shares)) * 12 * 100;
+    document.getElementById('monthlyIncome').textContent = `$${income.toLocaleString()}`;
+    document.getElementById('annualYield').textContent = `${yld.toFixed(1)}%`;
+}
+
+function updateAll() {
+    const price = parseFloat(document.getElementById('sharePrice').value) || 411.71;
+    const sh = parseInt(document.getElementById('numShares').value) || 2509;
+    const posVal = (price * sh).toLocaleString(undefined, {maximumFractionDigits: 0});
+    document.getElementById('tslaPrice').textContent = `$${price.toFixed(2)}`;
+    document.getElementById('positionValue').textContent = `$${posVal}`;
+}
+
+populateTable();
+buildIncomeChart();
+buildProjectionChart();
+</script>
+</body>
+</html>
